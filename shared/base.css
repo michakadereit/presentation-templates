@@ -83,6 +83,29 @@ a { color: inherit; }
 .section__inner {
   width: min(100%, 1100px);
   margin-inline: auto;
+  position: relative;
+  z-index: 0;
+}
+
+/* ---- Readability scrim (A11y contrast over the moving canvas) ------
+   A soft, semi-transparent halo painted behind each text block so the
+   effective background under the text is controlled by --scrim, not by
+   whatever the three.js scene happens to render. This guarantees the
+   text/background contrast stays WCAG-safe regardless of particle
+   brightness. Templates set --scrim (tinted opposite to their text
+   colour); default is transparent, so the halo is opt-in. */
+.section__inner::before {
+  content: "";
+  position: absolute;
+  inset: -16% -14%;
+  z-index: -1;
+  border-radius: 48px;
+  pointer-events: none;
+  background: radial-gradient(ellipse 96% 82% at 50% 50%,
+    var(--scrim, transparent) 0%,
+    var(--scrim, transparent) 62%,
+    transparent 90%);
+  transition: background 0.45s var(--ease);
 }
 
 /* Typographic building blocks */

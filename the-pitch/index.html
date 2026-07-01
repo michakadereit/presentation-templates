@@ -21,9 +21,12 @@
     :root {
       --bg: #f4f2ee;          /* warm off-white (fallback before WebGL) */
       --fg: #14161c;          /* near-black text */
-      --muted: #5c6270;       /* readable secondary gray */
+      --muted: #454b58;       /* secondary gray — darkened for WCAG AA (4.8:1) over the airy gradient */
       --accent: #4361ee;      /* blue */
       --accent-2: #7b2ff7;    /* violet */
+
+      /* A11y readability halo behind text (light, matches the airy bg) */
+      --scrim: rgba(244, 242, 238, 0.60);
     }
 
     /* Accent gradient text for hero words */
@@ -78,6 +81,12 @@
       transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
     }
     .cta:hover { transform: translateY(-3px); box-shadow: 0 24px 50px -18px rgba(123, 47, 247, 0.85); }
+
+    /* A11y: the kicker is small text; the raw accent blue (#4361ee) only
+       reaches ~3.7:1 over the tinted gradient. A deeper indigo clears AA
+       (5.3:1) while the vivid #4361ee stays on the large gradient words &
+       the white-on-button surfaces (which pass on their own). */
+    .kicker { color: #3149c9; }
 
     .hero-word { font-family: var(--font-serif); font-weight: 600; }
     .eyebrow-note { margin-top: var(--space-md); font-size: var(--step--1); letter-spacing: 0.04em; }

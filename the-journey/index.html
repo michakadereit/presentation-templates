@@ -19,20 +19,30 @@
     :root {
       --bg: #08090f;
       --fg: #f3f0ea;
-      --muted: #8b8fa3;
+      --muted: #9ca0b6;       /* A11y: aufgehellt (L .36) — hält .lead/.dim im
+                                 Aufhell-Übergang vor dem is-light-Flip ≥ AA */
       --accent: #ffb26e;      /* warmes Licht = Hoffnung / Aufstieg */
       --accent-2: #6ea8fe;    /* kühles Blau = Ausgangszustand */
+
+      /* A11y-Lesbarkeits-Halo hinter Text (dunkel, für helle Schrift). */
+      --scrim: rgba(6, 8, 14, 0.66);
     }
 
-    /* Inhaltssektionen etwas nach unten setzen, damit das Visual atmet. */
-    .section__inner { position: relative; }
-
-    /* Lesbarkeit über der bewegten Szene: sanfter Halo hinter Text. */
-    .veil {
-      background: radial-gradient(120% 80% at 50% 50%, rgba(8,9,15,0.72), rgba(8,9,15,0) 70%);
-      padding: var(--space-lg) var(--space-md);
-      border-radius: 24px;
+    /* Dynamische Farbanpassung an den Hintergrund:
+       Am Ende ("Neue Normalität") wird die Szene cremefarben. Ab ~90% Scroll
+       kippt <body class="is-light"> die Schrift auf dunkel, den Scrim auf hell
+       und den Akzent auf kontraststarkes Burnt-Orange — sonst wäre helle
+       Schrift auf Creme unlesbar (WCAG-Fail). Getrieben von der three.js-Szene. */
+    body.is-light {
+      --fg: #1c1509;
+      --muted: #574b39;
+      --accent: #9a4a12;      /* burnt orange — AA auf Creme */
+      --scrim: rgba(245, 238, 226, 0.66);
     }
+
+    /* Weicher Übergang beim Umschalten hell/dunkel. */
+    .headline, .subhead, .lead, .kicker, .quote, .attribution,
+    .chapter-index, .dim, .accent, .stat { transition: color 0.45s var(--ease); }
 
     .quote {
       font-family: var(--font-serif);
@@ -92,7 +102,7 @@
 
     <!-- 2 — THE FALL · Man in a Hole: der Absturz, Stimmung kippt -->
     <section class="section" id="fall">
-      <div class="section__inner veil reveal">
+      <div class="section__inner reveal">
         <span class="chapter-index">Kapitel II</span>
         <p class="kicker">Der Fall</p>
         <h2 class="subhead">Dann brach der große Kunde weg.</h2>
@@ -107,7 +117,7 @@
 
     <!-- 3 — THE STRUGGLE · tiefster Punkt + Rolls Royce Moment (sinnliches Detail) -->
     <section class="section" id="struggle">
-      <div class="section__inner text-center veil reveal">
+      <div class="section__inner text-center reveal">
         <span class="chapter-index">Kapitel III</span>
         <p class="kicker">Der tiefste Punkt</p>
         <!-- Rolls Royce Moment: ein konkretes, sinnliches Detail, das haften bleibt -->
@@ -123,7 +133,7 @@
 
     <!-- 4 — THE TURN · die Wende / Entscheidung -->
     <section class="section" id="turn">
-      <div class="section__inner veil reveal">
+      <div class="section__inner reveal">
         <span class="chapter-index">Kapitel IV</span>
         <p class="kicker">Die Wende</p>
         <h2 class="subhead">Eine Frage änderte den Kurs.</h2>
@@ -280,6 +290,10 @@
       scene.fog.color.copy(col);
       // Nebel lichtet sich zum hellen Ende hin
       scene.fog.density = 0.026 - 0.016 * p;
+
+      // Dynamische A11y-Farbanpassung: sobald die Szene hell wird, kippt die
+      // Schrift auf dunkel (siehe CSS `body.is-light`) — hält den Kontrast AA.
+      document.body.classList.toggle("is-light", p > 0.9);
     }
 
     function render() {
