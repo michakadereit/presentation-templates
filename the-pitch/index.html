@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Pitch — Cadence</title>
+
+  <!-- Shared design foundation -->
+  <link rel="stylesheet" href="../shared/base.css" />
+  <!-- Fonts referenced by base.css (fetched over https, file:// safe) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- ============================================================
+       Template palette override — THE PITCH
+       Light & airy premium look: off-white bg, near-black text,
+       vivid blue -> violet accent gradient.
+       ============================================================ -->
+  <style>
+    :root {
+      --bg: #f4f2ee;          /* warm off-white (fallback before WebGL) */
+      --fg: #14161c;          /* near-black text */
+      --muted: #5c6270;       /* readable secondary gray */
+      --accent: #4361ee;      /* blue */
+      --accent-2: #7b2ff7;    /* violet */
+    }
+
+    /* Accent gradient text for hero words */
+    .grad {
+      background: linear-gradient(100deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    /* Frosted plan cards on the light background */
+    .plan-card {
+      background: rgba(255, 255, 255, 0.62);
+      backdrop-filter: blur(10px) saturate(140%);
+      -webkit-backdrop-filter: blur(10px) saturate(140%);
+      border: 1px solid rgba(20, 22, 28, 0.06);
+      border-radius: 18px;
+      padding: var(--space-md);
+      box-shadow: 0 20px 50px -30px rgba(30, 40, 90, 0.45);
+      text-align: left;
+    }
+    .plan-card h3 { font-size: var(--step-1); margin-top: var(--space-xs); }
+    .plan-card p { color: var(--muted); margin-top: var(--space-xs); font-size: var(--step-0); }
+    .card-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 3rem; height: 3rem;
+      border-radius: 50%;
+      font-family: var(--font-serif);
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 10px 24px -10px rgba(67, 97, 238, 0.7);
+    }
+
+    /* Call to action */
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: var(--space-lg);
+      padding: 0.9rem 1.8rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: var(--step-0);
+      color: #fff;
+      text-decoration: none;
+      background: linear-gradient(100deg, var(--accent), var(--accent-2));
+      box-shadow: 0 16px 40px -16px rgba(67, 97, 238, 0.8);
+      transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+    }
+    .cta:hover { transform: translateY(-3px); box-shadow: 0 24px 50px -18px rgba(123, 47, 247, 0.85); }
+
+    .hero-word { font-family: var(--font-serif); font-weight: 600; }
+    .eyebrow-note { margin-top: var(--space-md); font-size: var(--step--1); letter-spacing: 0.04em; }
+    .lead-tight { max-width: 46ch; }
+  </style>
+</head>
+
+<body>
+  <!-- three.js background: kinetic gradient + soft particle field -->
+  <canvas class="scene-canvas" id="scene"></canvas>
+
+  <!-- Scroll progress bar + section nav dots (driven by shared/reveal.js) -->
+  <div class="progress" aria-hidden="true"></div>
+  <nav class="nav-dots" aria-label="Sections">
+    <a href="#hook" aria-label="Hook"></a>
+    <a href="#stakes" aria-label="The stakes"></a>
+    <a href="#guide" aria-label="Your guide"></a>
+    <a href="#plan" aria-label="The plan"></a>
+    <a href="#about" aria-label="What it's about"></a>
+  </nav>
+
+  <main class="deck">
+
+    <!-- ========================================================
+         1 · HOOK  —  Tactic: STORY HOOKS
+         A provocative one-liner that sparks instant curiosity.
+         ======================================================== -->
+    <section class="section text-center" id="hook">
+      <div class="section__inner reveal">
+        <p class="kicker">Cadence · for teams who ship</p>
+        <h1 class="headline headline--hero">
+          What if the <span class="hero-word grad">status meeting</span><br />
+          never needed to happen?
+        </h1>
+        <p class="lead lead-tight mx-auto">
+          Your best people lose <strong>400 hours a year</strong> to updates
+          that could have been a single, calm signal.
+        </p>
+      </div>
+      <div class="scroll-hint">Scroll</div>
+    </section>
+
+    <!-- ========================================================
+         2 · THE STAKES  —  Tactic: HERO & GUIDE (the hero's problem)
+         Name the emotional cost the audience already feels.
+         ======================================================== -->
+    <section class="section" id="stakes">
+      <div class="section__inner">
+        <p class="kicker reveal">The stakes</p>
+        <h2 class="headline reveal">
+          Busy isn't the same as <span class="grad">aligned.</span>
+        </h2>
+        <p class="lead reveal">
+          Decisions get buried in threads. Priorities drift between standups.
+          By Friday, half the team is rowing in a slightly different direction —
+          and nobody meant for it to happen.
+        </p>
+        <p class="lead reveal eyebrow-note dim">
+          The problem was never your people. It's that alignment is left to chance.
+        </p>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         3 · YOUR GUIDE  —  Tactic: HERO & GUIDE (empathy + authority)
+         You are the mentor: we understand, and we've earned the right to guide.
+         ======================================================== -->
+    <section class="section" id="guide">
+      <div class="section__inner">
+        <p class="kicker reveal">Your guide</p>
+        <h2 class="headline reveal">
+          We've stood exactly <span class="grad">where you are.</span>
+        </h2>
+        <p class="lead reveal">
+          Cadence is built by people who ran 200-engineer orgs and drowned in
+          the same status theater. We didn't want another dashboard — we wanted
+          the meeting to disappear and the clarity to stay.
+        </p>
+        <p class="lead reveal eyebrow-note dim">
+          Trusted by 1,200+ teams · SOC 2 Type II · works with the tools you already use.
+        </p>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         4 · THE PLAN  —  Tactic: THREE IS THE MAGIC NUMBER
+         Exactly three steps. Make the path feel effortless.
+         ======================================================== -->
+    <section class="section" id="plan">
+      <div class="section__inner text-center">
+        <p class="kicker reveal">The plan</p>
+        <h2 class="headline reveal">Aligned in three steps.</h2>
+        <div class="grid-3 stagger" style="margin-top: var(--space-lg); text-align:left;">
+          <article class="plan-card reveal" style="--i:0">
+            <span class="card-num">1</span>
+            <h3>Connect</h3>
+            <p>Plug in Slack, Jira, Linear and your calendar in two minutes.
+               No new habits to learn.</p>
+          </article>
+          <article class="plan-card reveal" style="--i:1">
+            <span class="card-num">2</span>
+            <h3>Cadence listens</h3>
+            <p>It quietly turns scattered updates into one clear signal —
+               what shipped, what's blocked, what changed.</p>
+          </article>
+          <article class="plan-card reveal" style="--i:2">
+            <span class="card-num">3</span>
+            <h3>Everyone aligns</h3>
+            <p>Your team reads five calm minutes a day. The status meeting
+               is gone — the alignment isn't.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         5 · WHAT IT'S ABOUT  —  Tactic: WHAT'S IT ABOUT?
+         One single, memorable core message + a clear call to action.
+         ======================================================== -->
+    <section class="section text-center" id="about">
+      <div class="section__inner reveal">
+        <p class="kicker">What it's about</p>
+        <h2 class="headline headline--hero">
+          Alignment,<br /><span class="grad">without the meeting.</span>
+        </h2>
+        <p class="lead lead-tight mx-auto">
+          Give your team back its focus — and its Fridays.
+        </p>
+        <a class="cta" href="#hook">Start free →</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Shared scroll behaviour (reveal, nav dots, progress, __scrollProgress) -->
+  <script defer src="../shared/reveal.js"></script>
+
+  <!-- ============================================================
+       three.js scene — inline module, https import only (file:// safe)
+       Kinetic light gradient (fullscreen shader plane) + soft particle
+       field with gentle mouse parallax. Purely decorative.
+       ============================================================ -->
+  <script type="module">
+    import * as THREE from "https://esm.sh/three@0.169.0";
+
+    const canvas = document.getElementById("scene");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0xf4f2ee, 1);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 6);
+
+    /* ---- Kinetic gradient (large plane far behind) ---- */
+    const gradientUniforms = {
+      uTime: { value: 0 },
+      uScroll: { value: 0 },
+    };
+    const gradient = new THREE.Mesh(
+      new THREE.PlaneGeometry(60, 60),
+      new THREE.ShaderMaterial({
+        uniforms: gradientUniforms,
+        depthWrite: false,
+        vertexShader: /* glsl */ `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: /* glsl */ `
+          precision highp float;
+          varying vec2 vUv;
+          uniform float uTime;
+          uniform float uScroll;
+
+          void main() {
+            vec2 uv = vUv;
+            vec3 base   = vec3(0.957, 0.949, 0.933); // off-white
+            vec3 blue   = vec3(0.263, 0.380, 0.933);
+            vec3 violet = vec3(0.482, 0.184, 0.968);
+
+            // hue drifts slowly with time and with scroll progress
+            float t = uTime * 0.05 + uScroll * 2.2;
+
+            vec2 c1 = vec2(0.30 + 0.15 * sin(t),        0.35 + 0.12 * cos(t * 0.8));
+            vec2 c2 = vec2(0.75 + 0.10 * cos(t * 0.6),  0.70 + 0.15 * sin(t * 0.5));
+
+            float d1 = smoothstep(0.62, 0.0, distance(uv, c1));
+            float d2 = smoothstep(0.70, 0.0, distance(uv, c2));
+
+            // low mix factors keep it airy so text stays readable
+            vec3 col = base;
+            col = mix(col, blue,   d1 * 0.20);
+            col = mix(col, violet, d2 * 0.17);
+
+            gl_FragColor = vec4(col, 1.0);
+          }
+        `,
+      })
+    );
+    gradient.position.z = -10;
+    scene.add(gradient);
+
+    /* ---- Soft particle field ---- */
+    // Round soft sprite generated on an offscreen canvas.
+    function makeDotTexture() {
+      const s = 64;
+      const c = document.createElement("canvas");
+      c.width = c.height = s;
+      const ctx = c.getContext("2d");
+      const g = ctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+      g.addColorStop(0, "rgba(255,255,255,1)");
+      g.addColorStop(0.4, "rgba(255,255,255,0.6)");
+      g.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, s, s);
+      const tex = new THREE.CanvasTexture(c);
+      return tex;
+    }
+
+    const COUNT = 220;
+    const positions = new Float32Array(COUNT * 3);
+    const depths = new Float32Array(COUNT); // parallax weight per particle
+    for (let i = 0; i < COUNT; i++) {
+      positions[i * 3 + 0] = (Math.random() - 0.5) * 16;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 12;
+      positions[i * 3 + 2] = -2 + Math.random() * 5;
+      depths[i] = 0.3 + Math.random() * 0.7;
+    }
+    const pGeo = new THREE.BufferGeometry();
+    pGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+    const points = new THREE.Points(
+      pGeo,
+      new THREE.PointsMaterial({
+        size: 0.14,
+        map: makeDotTexture(),
+        color: new THREE.Color(0x7b2ff7),
+        transparent: true,
+        opacity: 0.42,
+        depthWrite: false,
+        sizeAttenuation: true,
+      })
+    );
+    scene.add(points);
+
+    /* ---- Interaction: gentle mouse parallax ---- */
+    const mouse = { x: 0, y: 0 };
+    const target = { x: 0, y: 0 };
+    if (!reduceMotion) {
+      window.addEventListener("pointermove", (e) => {
+        target.x = (e.clientX / window.innerWidth - 0.5) * 2;
+        target.y = (e.clientY / window.innerHeight - 0.5) * 2;
+      }, { passive: true });
+    }
+
+    /* ---- Resize ---- */
+    function onResize() {
+      const w = window.innerWidth, h = window.innerHeight;
+      renderer.setSize(w, h);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener("resize", onResize, { passive: true });
+
+    /* ---- Render loop ---- */
+    const clock = new THREE.Clock();
+    function render() {
+      const dt = clock.getDelta();
+      gradientUniforms.uTime.value += dt;
+      gradientUniforms.uScroll.value += ((window.__scrollProgress || 0) - gradientUniforms.uScroll.value) * 0.05;
+
+      // ease mouse -> camera parallax
+      mouse.x += (target.x - mouse.x) * 0.04;
+      mouse.y += (target.y - mouse.y) * 0.04;
+      camera.position.x = mouse.x * 1.1;
+      camera.position.y = -mouse.y * 0.7;
+      camera.lookAt(0, 0, 0);
+
+      // slow drift of the particle field
+      points.rotation.z += dt * 0.01;
+      points.position.y = Math.sin(gradientUniforms.uTime.value * 0.15) * 0.15;
+
+      renderer.render(scene, camera);
+    }
+
+    if (reduceMotion) {
+      // static single frame — no animation
+      renderer.render(scene, camera);
+    } else {
+      renderer.setAnimationLoop(render);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Journey — Halden</title>
+
+  <!-- Shared design foundation -->
+  <link rel="stylesheet" href="../shared/base.css" />
+
+  <!--
+    THE JOURNEY — Story-Struktur: "Man in a Hole" (Pip Decks / Storyteller Tactics)
+    Status quo -> Fall -> Struggle (mit Rolls Royce Moment) -> Turn -> Rise -> New Normal.
+    Optik: cinematisch, Stimmung wandert dunkel -> hell mit dem Scroll.
+    Kamera sinkt in einen Partikel-Tunnel hinab und steigt wieder auf.
+  -->
+  <style>
+    /* Palette-Override: Start dunkel, warmer Akzent für die Erlösung am Ende. */
+    :root {
+      --bg: #08090f;
+      --fg: #f3f0ea;
+      --muted: #8b8fa3;
+      --accent: #ffb26e;      /* warmes Licht = Hoffnung / Aufstieg */
+      --accent-2: #6ea8fe;    /* kühles Blau = Ausgangszustand */
+    }
+
+    /* Inhaltssektionen etwas nach unten setzen, damit das Visual atmet. */
+    .section__inner { position: relative; }
+
+    /* Lesbarkeit über der bewegten Szene: sanfter Halo hinter Text. */
+    .veil {
+      background: radial-gradient(120% 80% at 50% 50%, rgba(8,9,15,0.72), rgba(8,9,15,0) 70%);
+      padding: var(--space-lg) var(--space-md);
+      border-radius: 24px;
+    }
+
+    .quote {
+      font-family: var(--font-serif);
+      font-size: var(--step-2);
+      line-height: 1.15;
+      font-style: italic;
+      text-wrap: balance;
+    }
+    .quote span { color: var(--accent); font-style: normal; }
+    .attribution { margin-top: var(--space-md); color: var(--muted); letter-spacing: 0.04em; }
+
+    .chapter-index {
+      font-family: var(--font-serif);
+      font-size: var(--step-2);
+      color: var(--accent);
+      opacity: 0.55;
+      display: block;
+      margin-bottom: var(--space-sm);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- three.js Hintergrundszene (rein dekorativ) -->
+  <canvas class="scene-canvas" aria-hidden="true"></canvas>
+
+  <!-- Scroll-Fortschrittsbalken -->
+  <div class="progress" aria-hidden="true"></div>
+
+  <!-- Sektions-Navigation -->
+  <nav class="nav-dots" aria-label="Kapitel">
+    <a href="#status-quo" aria-label="Status Quo"></a>
+    <a href="#fall" aria-label="Der Fall"></a>
+    <a href="#struggle" aria-label="Der Kampf"></a>
+    <a href="#turn" aria-label="Die Wende"></a>
+    <a href="#rise" aria-label="Der Aufstieg"></a>
+    <a href="#new-normal" aria-label="Neue Normalität"></a>
+  </nav>
+
+  <main class="deck">
+
+    <!-- 1 — STATUS QUO · Story Hook: ruhiger, fast zu ruhiger Ausgangszustand -->
+    <section class="section" id="status-quo">
+      <div class="section__inner text-center reveal">
+        <span class="chapter-index">Kapitel I</span>
+        <p class="kicker">Wie alles begann</p>
+        <h1 class="headline">Es lief. <span class="dim">Irgendwie.</span></h1>
+        <p class="lead mx-auto">
+          Das Team hinter <strong>Halden</strong> lieferte jede Woche. Nicht großartig,
+          aber verlässlich. Niemand sprach aus, was alle spürten: Die Luft war raus.
+          Das ist der Moment, bevor eine Geschichte beginnt — der ruhige Stand,
+          der nach Veränderung ruft.
+        </p>
+      </div>
+      <div class="scroll-hint">scroll</div>
+    </section>
+
+    <!-- 2 — THE FALL · Man in a Hole: der Absturz, Stimmung kippt -->
+    <section class="section" id="fall">
+      <div class="section__inner veil reveal">
+        <span class="chapter-index">Kapitel II</span>
+        <p class="kicker">Der Fall</p>
+        <h2 class="subhead">Dann brach der große Kunde weg.</h2>
+        <p class="lead">
+          An einem Dienstag im November. Eine E-Mail, drei Zeilen lang.
+          Vierzig Prozent des Umsatzes — weg. Was folgte, war kein Knall,
+          sondern ein langsames Absacken: längere Meetings, kürzere Nächte,
+          leisere Standups.
+        </p>
+      </div>
+    </section>
+
+    <!-- 3 — THE STRUGGLE · tiefster Punkt + Rolls Royce Moment (sinnliches Detail) -->
+    <section class="section" id="struggle">
+      <div class="section__inner text-center veil reveal">
+        <span class="chapter-index">Kapitel III</span>
+        <p class="kicker">Der tiefste Punkt</p>
+        <!-- Rolls Royce Moment: ein konkretes, sinnliches Detail, das haften bleibt -->
+        <blockquote class="quote">
+          „Freitag, <span>23:47 Uhr</span>. Der vierte Kaffee ist kalt.
+          Der Build ist rot — zum dritten Mal. Draußen räumt jemand die Straße.
+          Drinnen fragt niemand mehr, <span>ob</span> wir es schaffen,
+          sondern nur noch, <span>wann</span> es endet.“
+        </blockquote>
+        <p class="attribution">— Mira, Lead Engineer, aus dem Team-Retro</p>
+      </div>
+    </section>
+
+    <!-- 4 — THE TURN · die Wende / Entscheidung -->
+    <section class="section" id="turn">
+      <div class="section__inner veil reveal">
+        <span class="chapter-index">Kapitel IV</span>
+        <p class="kicker">Die Wende</p>
+        <h2 class="subhead">Eine Frage änderte den Kurs.</h2>
+        <p class="lead">
+          „Was, wenn wir aufhören, alles zu retten — und stattdessen <em>eine</em>
+          Sache richtig gut machen?“ Das Team strich achtzig Prozent der Roadmap.
+          Kein neuer Held kam zur Rettung. Die Entscheidung kam von innen.
+        </p>
+      </div>
+    </section>
+
+    <!-- 5 — THE RISE · Herausklettern, Stimmung hellt auf -->
+    <section class="section" id="rise">
+      <div class="section__inner text-center reveal">
+        <span class="chapter-index">Kapitel V</span>
+        <p class="kicker">Der Aufstieg</p>
+        <h2 class="headline">Und plötzlich <span class="accent">zog es an.</span></h2>
+        <p class="lead mx-auto">
+          Fokus schlug Feuerwehr. Der erste grüne Build seit Wochen. Dann der zweite.
+          Ein neuer Kunde — diesmal einer, der zum fokussierten Produkt passte.
+          Die Standups wurden wieder lauter.
+        </p>
+      </div>
+    </section>
+
+    <!-- 6 — NEW NORMAL · Auflösung (hell) + Ausblick -->
+    <section class="section" id="new-normal">
+      <div class="section__inner text-center reveal">
+        <span class="chapter-index">Kapitel VI</span>
+        <p class="kicker">Neue Normalität</p>
+        <h2 class="headline">Nicht zurück. <span class="accent">Weiter.</span></h2>
+        <div class="grid-3 stagger" style="margin-top: var(--space-lg); text-align:left;">
+          <div class="reveal" style="--i:0"><p class="stat accent">1</p><p class="dim">klares Produkt statt zehn halber.</p></div>
+          <div class="reveal" style="--i:1"><p class="stat accent">0</p><p class="dim">durchgearbeitete Nächte im letzten Quartal.</p></div>
+          <div class="reveal" style="--i:2"><p class="stat accent">+3</p><p class="dim">neue Kund:innen, die zum Fokus passen.</p></div>
+        </div>
+        <p class="lead mx-auto" style="margin-top: var(--space-lg);">
+          Das Tal war nicht das Ende der Geschichte. Es war ihre Mitte.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Shared scroll behaviour (Reveal, Nav-Dots, Progress, window.__scrollProgress) -->
+  <script defer src="../shared/reveal.js"></script>
+
+  <!-- ===================================================================
+       three.js Szene — INLINE Modul, Import nur von absoluter HTTPS-URL,
+       damit die Seite per Doppelklick über file:// läuft.
+       Kamera fliegt durch einen Partikel-Tunnel, sinkt zur Mitte hinab
+       (tiefster/dunkelster Punkt) und steigt zum hellen Ende wieder auf.
+       =================================================================== -->
+  <script type="module">
+    import * as THREE from "https://esm.sh/three@0.169.0";
+
+    const canvas = document.querySelector(".scene-canvas");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // --- Renderer ---
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 400);
+
+    // --- Stimmungs-Keyframes: dunkel -> am dunkelsten (Mitte) -> hell ---
+    // p = geglätteter Scrollfortschritt 0..1
+    const MOOD = [
+      { p: 0.00, col: new THREE.Color("#141a2e") }, // Status quo: kühl, gedämpft
+      { p: 0.25, col: new THREE.Color("#0a0c16") }, // Fall: dunkler
+      { p: 0.45, col: new THREE.Color("#050507") }, // Struggle: fast schwarz (tiefster Punkt)
+      { p: 0.62, col: new THREE.Color("#1a1526") }, // Turn: erstes Violett
+      { p: 0.82, col: new THREE.Color("#3a2c3f") }, // Rise: wärmer
+      { p: 1.00, col: new THREE.Color("#f0e6d8") }, // New Normal: warmes Licht
+    ];
+    const moodColor = (p) => {
+      for (let i = 0; i < MOOD.length - 1; i++) {
+        const a = MOOD[i], b = MOOD[i + 1];
+        if (p <= b.p) {
+          const t = (p - a.p) / (b.p - a.p || 1);
+          return a.col.clone().lerp(b.col, Math.max(0, Math.min(1, t)));
+        }
+      }
+      return MOOD[MOOD.length - 1].col.clone();
+    };
+
+    scene.fog = new THREE.FogExp2(MOOD[0].col.clone(), 0.018);
+    scene.background = MOOD[0].col.clone();
+
+    // --- Partikel-Tunnel: Punkte auf einer Röhre entlang -z ---
+    const LENGTH = 260;          // Tunneltiefe
+    const COUNT = reduceMotion ? 2500 : 9000;
+    const positions = new Float32Array(COUNT * 3);
+    const colors = new Float32Array(COUNT * 3);
+    const cool = new THREE.Color("#6ea8fe");
+    const warm = new THREE.Color("#ffb26e");
+
+    for (let i = 0; i < COUNT; i++) {
+      const z = -Math.random() * LENGTH;
+      const angle = Math.random() * Math.PI * 2;
+      // Radius mit leichter Variation -> Tunnelwand mit Tiefe
+      const radius = 9 + Math.random() * 9;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      positions[i * 3 + 0] = x;
+      positions[i * 3 + 1] = y;
+      positions[i * 3 + 2] = z;
+
+      // Farbe entlang der Tiefe von kühl -> warm mischen
+      const mix = i / COUNT;
+      const c = cool.clone().lerp(warm, mix);
+      colors[i * 3 + 0] = c.r;
+      colors[i * 3 + 1] = c.g;
+      colors[i * 3 + 2] = c.b;
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+    const mat = new THREE.PointsMaterial({
+      size: 0.18,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.9,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true,
+    });
+    const points = new THREE.Points(geo, mat);
+    scene.add(points);
+
+    // --- Kamerapfad: Reise nach vorn (-z), Abtauchen zur Mitte, Aufstieg zum Ende ---
+    // y(p) = rise*p  -  DIP*sin(pi*p)   -> p=0:0 · Mitte: negativ (unten) · p=1: rise (oben)
+    const DIP = 7.0;   // Tiefe des Absinkens
+    const RISE = 5.0;  // Endhöhe (Aufstieg ins Licht)
+    const cameraY = (p) => RISE * p - DIP * Math.sin(Math.PI * p);
+    const cameraZ = (p) => 8 - p * (LENGTH - 40); // reist durch den Tunnel
+
+    // --- Geglätteter Scrollwert (Damping gegen Ruckeln) ---
+    let smooth = 0;
+    const target = () => (typeof window.__scrollProgress === "number" ? window.__scrollProgress : 0);
+
+    function applyCamera(p) {
+      camera.position.set(0, cameraY(p), cameraZ(p));
+      // Blickrichtung: beim Abtauchen nach unten, beim Aufstieg nach oben schauen
+      const lookY = cameraY(Math.min(1, p + 0.12)) + (p < 0.45 ? -2.5 : 2.0);
+      camera.lookAt(0, lookY, cameraZ(p) - 20);
+
+      const col = moodColor(p);
+      scene.background.copy(col);
+      scene.fog.color.copy(col);
+      // Nebel lichtet sich zum hellen Ende hin
+      scene.fog.density = 0.026 - 0.016 * p;
+    }
+
+    function render() {
+      renderer.render(scene, camera);
+    }
+
+    if (reduceMotion) {
+      // Statisch: einmal an aktueller Scrollposition zeichnen, kein Loop/Idle-Motion.
+      smooth = target();
+      applyCamera(smooth);
+      render();
+      window.addEventListener("scroll", () => { applyCamera(target()); render(); }, { passive: true });
+    } else {
+      const clock = new THREE.Clock();
+      function loop() {
+        requestAnimationFrame(loop);
+        smooth += (target() - smooth) * 0.06; // Damping
+        applyCamera(smooth);
+        // dezente Eigenbewegung: Tunnel rotiert minimal, lebt
+        points.rotation.z = clock.getElapsedTime() * 0.02;
+        render();
+      }
+      loop();
+    }
+
+    // --- Resize ---
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      render();
+    });
+  </script>
+</body>
+</html>

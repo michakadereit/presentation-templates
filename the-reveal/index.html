@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Reveal — Data Story Template</title>
+
+  <!-- Shared design foundation + scroll behaviour (file://-safe, non-module) -->
+  <link rel="stylesheet" href="../shared/base.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet" />
+
+  <!-- Template palette: dark, editorial, high-contrast, electric accent -->
+  <style>
+    :root {
+      --bg: #050608;
+      --fg: #f2f4f7;
+      --muted: #7c8698;
+      --accent: #22e0d6;      /* electric cyan */
+      --accent-2: #ffb020;    /* amber */
+    }
+    body { background: radial-gradient(120% 90% at 50% -10%, #0c1418 0%, #050608 55%); }
+
+    /* Editorial numerals */
+    .stat {
+      background: linear-gradient(180deg, var(--fg) 0%, var(--accent) 140%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-variant-numeric: tabular-nums;
+    }
+    .clue-num { display: flex; align-items: baseline; gap: 0.15em; justify-content: center; }
+    .clue-num .suffix { font-size: var(--step-2); font-weight: 700; color: var(--accent); -webkit-text-fill-color: var(--accent); }
+
+    .rule { width: 64px; height: 3px; background: var(--accent); margin: var(--space-md) auto 0; }
+    .puzzle { font-family: var(--font-serif); font-style: italic; color: var(--accent-2); }
+
+    /* The Reveal section — dramatic framing */
+    #reveal .section__inner { position: relative; }
+    #reveal .stat { font-size: clamp(4rem, 2rem + 12vw, 12rem); }
+    .glow { text-shadow: 0 0 60px color-mix(in srgb, var(--accent) 55%, transparent); }
+
+    .cta {
+      display: inline-block; margin-top: var(--space-md);
+      padding: 0.9em 1.8em; border: 1.5px solid var(--accent);
+      border-radius: 999px; color: var(--accent); font-weight: 600;
+      letter-spacing: 0.04em; text-decoration: none;
+      transition: background 0.3s var(--ease), color 0.3s var(--ease);
+    }
+    .cta:hover { background: var(--accent); color: #04211f; }
+    .label { font-size: var(--step-0); color: var(--muted); margin-top: var(--space-sm); }
+  </style>
+</head>
+<body>
+  <!-- three.js background: particle field that converges on The Reveal -->
+  <canvas class="scene-canvas" aria-hidden="true"></canvas>
+
+  <div class="progress"></div>
+
+  <!-- one dot per section -->
+  <nav class="nav-dots" aria-label="Sektionen">
+    <a href="#setup" aria-label="The Setup"></a>
+    <a href="#clue-1" aria-label="Clue One"></a>
+    <a href="#clue-2" aria-label="Clue Two"></a>
+    <a href="#clue-3" aria-label="Clue Three"></a>
+    <a href="#reveal" aria-label="The Reveal"></a>
+    <a href="#sowhat" aria-label="So What"></a>
+  </nav>
+
+  <main class="deck">
+
+    <!-- 1. THE SETUP — Storyteller Tactic: Secrets & Puzzles (verspricht eine Enthüllung) -->
+    <section class="section" id="setup">
+      <div class="section__inner text-center">
+        <p class="kicker reveal">Eine Untersuchung</p>
+        <h1 class="headline reveal" style="--reveal-delay:80ms">
+          Warum verlieren wir <span class="puzzle">73&nbsp;%</span> unserer Nutzer,<br />
+          bevor sie je den „Aha“-Moment erreichen?
+        </h1>
+        <p class="lead mx-auto reveal" style="--reveal-delay:200ms">
+          Drei Spuren führen zur Antwort. Jede für sich wirkt harmlos.
+          Zusammen erzählen sie eine Geschichte, die niemand erwartet hat.
+        </p>
+        <div class="rule reveal" style="--reveal-delay:320ms"></div>
+        <p class="scroll-hint">Den Spuren folgen ↓</p>
+      </div>
+    </section>
+
+    <!-- 2. CLUE ONE — Data Detective (Fakt in Erzählung gewickelt) -->
+    <section class="section" id="clue-1">
+      <div class="section__inner text-center">
+        <p class="kicker reveal">Spur Eins · Das Onboarding</p>
+        <div class="clue-num reveal" style="--reveal-delay:80ms">
+          <span class="stat" data-count-to="8" data-suffix=" min">0</span>
+        </div>
+        <p class="lead mx-auto reveal" style="--reveal-delay:200ms">
+          So lange braucht ein neuer Nutzer im Schnitt bis zur ersten sinnvollen Aktion.
+          Acht Minuten Leere — in denen die Neugier langsam erlischt.
+        </p>
+      </div>
+    </section>
+
+    <!-- 3. CLUE TWO — Data Detective -->
+    <section class="section" id="clue-2">
+      <div class="section__inner text-center">
+        <p class="kicker reveal">Spur Zwei · Die Reibung</p>
+        <div class="clue-num reveal" style="--reveal-delay:80ms">
+          <span class="stat" data-count-to="11">0</span>
+        </div>
+        <p class="lead mx-auto reveal" style="--reveal-delay:200ms">
+          Elf Pflichtfelder trennen die Anmeldung vom ersten Erfolgserlebnis.
+          Jedes einzelne ein kleiner Grund, den Tab zu schließen.
+        </p>
+      </div>
+    </section>
+
+    <!-- 4. CLUE THREE — Three is the Magic Number (die Dreierspur schließt sich) -->
+    <section class="section" id="clue-3">
+      <div class="section__inner text-center">
+        <p class="kicker reveal">Spur Drei · Die Stille</p>
+        <div class="clue-num reveal" style="--reveal-delay:80ms">
+          <span class="stat" data-count-to="0" data-count-from="24" data-suffix=" h">24</span>
+        </div>
+        <p class="lead mx-auto reveal" style="--reveal-delay:200ms">
+          Null Kontaktpunkte in den ersten 24 Stunden. Keine Mail, kein Hinweis,
+          kein Grund zurückzukommen. Drei Spuren — und plötzlich ergeben sie ein Muster.
+        </p>
+      </div>
+    </section>
+
+    <!-- 5. THE REVEAL — der Aha-Moment; Partikel formieren sich hier -->
+    <section class="section" id="reveal">
+      <div class="section__inner text-center">
+        <p class="kicker reveal glow">Die Enthüllung</p>
+        <div class="clue-num reveal" style="--reveal-delay:120ms">
+          <span class="stat glow" data-count-to="3.4" data-decimals="1" data-suffix="×">0</span>
+        </div>
+        <p class="label reveal" style="--reveal-delay:220ms">höhere Aktivierung</p>
+        <p class="lead mx-auto reveal glow" style="--reveal-delay:320ms">
+          Nutzer, die den „Aha“-Moment in unter 60&nbsp;Sekunden erreichen, bleiben
+          <strong class="accent">3,4-mal</strong> häufiger. Es war nie das Produkt —
+          es waren die ersten sechzig Sekunden.
+        </p>
+      </div>
+    </section>
+
+    <!-- 6. SO WHAT — Implikation / Call to Action -->
+    <section class="section" id="sowhat">
+      <div class="section__inner text-center">
+        <p class="kicker reveal">Was jetzt zählt</p>
+        <h2 class="subhead reveal" style="--reveal-delay:80ms">
+          Kürze den Weg zum ersten Erfolg auf <span class="accent">unter 60 Sekunden</span>.
+        </h2>
+        <p class="lead mx-auto reveal" style="--reveal-delay:200ms">
+          Ein Fokus. Drei Spuren. Eine Zahl, die alles verändert.
+          Der Rest ist Umsetzung.
+        </p>
+        <a class="cta reveal" style="--reveal-delay:320ms" href="#setup">Den Plan starten →</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Shared scroll behaviour: reveals, nav dots, progress, window.__scrollProgress -->
+  <script defer src="../shared/reveal.js"></script>
+
+  <!-- Count-up: große Zahlen zählen hoch, sobald sichtbar (klassisch, file://-safe) -->
+  <script>
+    (function () {
+      "use strict";
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      function format(v, decimals) {
+        return decimals > 0
+          ? v.toLocaleString("de-DE", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+          : Math.round(v).toLocaleString("de-DE");
+      }
+
+      function run(el) {
+        var to = parseFloat(el.getAttribute("data-count-to"));
+        var from = parseFloat(el.getAttribute("data-count-from") || "0");
+        var decimals = parseInt(el.getAttribute("data-decimals") || "0", 10);
+        var suffix = el.getAttribute("data-suffix") || "";
+        if (reduce) { el.textContent = format(to, decimals) + suffix; return; }
+
+        var dur = 1600, start = null;
+        function frame(t) {
+          if (start === null) start = t;
+          var p = Math.min((t - start) / dur, 1);
+          var eased = 1 - Math.pow(1 - p, 3);        // easeOutCubic
+          el.textContent = format(from + (to - from) * eased, decimals) + suffix;
+          if (p < 1) requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      }
+
+      var nums = document.querySelectorAll("[data-count-to]");
+      if (!("IntersectionObserver" in window)) { nums.forEach(run); return; }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { run(e.target); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.6 });
+      nums.forEach(function (n) { io.observe(n); });
+    })();
+  </script>
+
+  <!-- three.js particle scene — inline module, HTTPS import only (file://-safe) -->
+  <script type="module">
+    import * as THREE from "https://esm.sh/three@0.169.0";
+
+    const canvas = document.querySelector(".scene-canvas");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.z = 14;
+
+    // --- Particles: each has a scattered "drift" home + a "sphere" target ---
+    const COUNT = reduce ? 1400 : 4200;
+    const scattered = new Float32Array(COUNT * 3);
+    const sphere = new Float32Array(COUNT * 3);
+    const positions = new Float32Array(COUNT * 3);
+    const seeds = new Float32Array(COUNT);
+
+    const R = 6.2;
+    for (let i = 0; i < COUNT; i++) {
+      // scattered cloud (wide, shallow box)
+      const sx = (Math.random() - 0.5) * 34;
+      const sy = (Math.random() - 0.5) * 20;
+      const sz = (Math.random() - 0.5) * 16;
+      scattered[i * 3] = sx; scattered[i * 3 + 1] = sy; scattered[i * 3 + 2] = sz;
+
+      // sphere target (Fibonacci distribution → even shell)
+      const phi = Math.acos(1 - 2 * (i + 0.5) / COUNT);
+      const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+      sphere[i * 3] = R * Math.sin(phi) * Math.cos(theta);
+      sphere[i * 3 + 1] = R * Math.sin(phi) * Math.sin(theta);
+      sphere[i * 3 + 2] = R * Math.cos(phi);
+
+      positions[i * 3] = sx; positions[i * 3 + 1] = sy; positions[i * 3 + 2] = sz;
+      seeds[i] = Math.random() * Math.PI * 2;
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+    const sprite = makeDotTexture();
+    const mat = new THREE.PointsMaterial({
+      size: 0.14,
+      map: sprite,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      color: new THREE.Color("#22e0d6"),
+    });
+    const points = new THREE.Points(geo, mat);
+    scene.add(points);
+
+    const amber = new THREE.Color("#ffb020");
+    const cyan = new THREE.Color("#22e0d6");
+
+    // smoothstep helper
+    const smooth = (a, b, x) => {
+      const t = Math.min(Math.max((x - a) / (b - a), 0), 1);
+      return t * t * (3 - 2 * t);
+    };
+
+    const pos = geo.attributes.position.array;
+    let progress = 0;
+    const clock = new THREE.Clock();
+
+    function tick() {
+      const t = clock.getElapsedTime();
+      // ease the scroll progress for smoother motion
+      progress += ((window.__scrollProgress || 0) - progress) * 0.06;
+
+      // formation ramps up in the last third → peaks at The Reveal, eases after
+      const form = smooth(0.55, 0.82, progress) * (1 - smooth(0.9, 1.0, progress) * 0.25);
+      const drift = reduce ? 0.15 : 1;
+
+      for (let i = 0; i < COUNT; i++) {
+        const j = i * 3;
+        const wobble = Math.sin(t * 0.6 + seeds[i]) * 0.4 * drift;
+        const tx = scattered[j] + wobble;
+        const ty = scattered[j + 1] + Math.cos(t * 0.5 + seeds[i]) * 0.4 * drift;
+        const tz = scattered[j + 2];
+        pos[j]     = tx + (sphere[j] - tx) * form;
+        pos[j + 1] = ty + (sphere[j + 1] - ty) * form;
+        pos[j + 2] = tz + (sphere[j + 2] - tz) * form;
+      }
+      geo.attributes.position.needsUpdate = true;
+
+      // colour shifts amber → cyan as the picture resolves
+      mat.color.copy(amber).lerp(cyan, form);
+      mat.size = 0.12 + form * 0.06;
+
+      points.rotation.y = t * 0.02 + progress * 0.6;
+      camera.position.z = 14 - form * 3.5;   // push in on reveal
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+    tick();
+
+    function makeDotTexture() {
+      const s = 64;
+      const c = document.createElement("canvas");
+      c.width = c.height = s;
+      const ctx = c.getContext("2d");
+      const g = ctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+      g.addColorStop(0, "rgba(255,255,255,1)");
+      g.addColorStop(0.4, "rgba(255,255,255,0.6)");
+      g.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, s, s);
+      const tex = new THREE.CanvasTexture(c);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }, { passive: true });
+  </script>
+</body>
+</html>

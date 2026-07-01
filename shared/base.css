@@ -1,0 +1,181 @@
+/* ============================================================
+   Presentation Templates — Shared Design Foundation
+   Neutral base: design tokens, reset, typography scale,
+   scroll-section layout, reveal utilities, nav + progress.
+   Each template overrides palette + accents in its own <style>.
+   ============================================================ */
+
+/* ---- Design tokens ---------------------------------------- */
+:root {
+  /* Palette (override per template) */
+  --bg: #0b0d12;
+  --fg: #f5f6f8;
+  --muted: #9aa2b1;
+  --accent: #6ea8fe;
+  --accent-2: #b388ff;
+
+  /* Type scale — fluid via clamp(min, vw, max) */
+  --step--1: clamp(0.83rem, 0.78rem + 0.25vw, 0.95rem);
+  --step-0:  clamp(1rem, 0.92rem + 0.4vw, 1.25rem);
+  --step-1:  clamp(1.35rem, 1.15rem + 1vw, 2rem);
+  --step-2:  clamp(1.9rem, 1.4rem + 2.4vw, 3.5rem);
+  --step-3:  clamp(2.6rem, 1.6rem + 4.8vw, 6rem);
+  --step-4:  clamp(3.4rem, 1.8rem + 8vw, 9rem);
+
+  /* Spacing */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 2rem;
+  --space-lg: 4rem;
+  --space-xl: 8rem;
+
+  --measure: 60ch;          /* readable line length */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Fraunces", "Iowan Old Style", Georgia, serif;
+}
+
+/* ---- Reset ------------------------------------------------ */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: 1.5;
+  color: var(--fg);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+img, canvas { display: block; max-width: 100%; }
+h1, h2, h3 { line-height: 1.05; letter-spacing: -0.02em; font-weight: 600; text-wrap: balance; }
+p { max-width: var(--measure); text-wrap: pretty; }
+a { color: inherit; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* ---- three.js background canvas --------------------------- */
+/* Fixed full-viewport layer behind all content. */
+.scene-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ---- Scroll-section layout -------------------------------- */
+.deck { position: relative; z-index: 1; }
+
+.section {
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-xl) var(--space-md);
+}
+.section__inner {
+  width: min(100%, 1100px);
+  margin-inline: auto;
+}
+
+/* Typographic building blocks */
+.kicker {
+  font-size: var(--step--1);
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: var(--space-sm);
+}
+.headline { font-size: var(--step-3); }
+.headline--hero { font-size: var(--step-4); }
+.subhead { font-size: var(--step-2); }
+.lead {
+  font-size: var(--step-1);
+  color: var(--muted);
+  margin-top: var(--space-md);
+  font-weight: 400;
+}
+.dim { color: var(--muted); }
+.accent { color: var(--accent); }
+
+/* ---- Reveal-on-scroll (driven by shared/reveal.js) -------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+.reveal.is-visible { opacity: 1; transform: none; }
+
+/* Stagger helper: set on a parent, children reveal in sequence */
+.stagger > * { --reveal-delay: calc(var(--i, 0) * 120ms); }
+
+/* ---- Scroll progress bar ---------------------------------- */
+.progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  width: 100%;
+  transform: scaleX(var(--progress, 0));
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  z-index: 100;
+}
+
+/* ---- Section nav dots ------------------------------------- */
+.nav-dots {
+  position: fixed;
+  right: clamp(1rem, 3vw, 2.5rem);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  z-index: 100;
+}
+.nav-dots a {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid var(--muted);
+  opacity: 0.5;
+  transition: all 0.3s var(--ease);
+}
+.nav-dots a.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  opacity: 1;
+  transform: scale(1.35);
+}
+
+/* ---- Scroll hint ------------------------------------------ */
+.scroll-hint {
+  position: absolute;
+  bottom: var(--space-md);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--step--1);
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  animation: bob 2s var(--ease) infinite;
+}
+@keyframes bob { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 8px); } }
+
+/* ---- Utility --------------------------------------------- */
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-md);
+}
+.stat { font-size: var(--step-4); font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
+.text-center { text-align: center; }
+.mx-auto { margin-inline: auto; }
