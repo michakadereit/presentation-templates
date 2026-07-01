@@ -101,11 +101,17 @@
 
     /* Targeted halo for smaller body text that needs contrast support */
     .lead-halo {
-      background: rgba(244, 242, 238, 0.55);
+      background: rgba(244, 242, 238, 0.25);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       border-radius: 14px;
-      padding: 0.6rem 1.4rem;
+      padding: 0.3rem 0.7rem;
+    }
+
+    /* Halo fades in as the section scrolls to the vertical center (driven by JS below) */
+    .section__inner::before {
+      opacity: var(--halo-opacity, 0);
+      transition: background 0.45s var(--ease), opacity 0.15s linear;
     }
   </style>
 </head>
@@ -239,6 +245,30 @@
 
   <!-- Shared scroll behaviour (reveal, nav dots, progress, __scrollProgress) -->
   <script defer src="../shared/reveal.js"></script>
+
+  <!-- Halo: opacity peaks when section__inner is vertically centred in the viewport -->
+  <script>
+    (function () {
+      var inners = document.querySelectorAll('.section__inner');
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        inners.forEach(function (el) { el.style.setProperty('--halo-opacity', '1'); });
+        return;
+      }
+      function updateHalos() {
+        var halfH = window.innerHeight / 2;
+        inners.forEach(function (el) {
+          var rect = el.getBoundingClientRect();
+          var elCenter = rect.top + rect.height / 2;
+          var dist = Math.abs(elCenter - halfH);
+          var v = Math.max(0, 1 - dist / halfH);
+          el.style.setProperty('--halo-opacity', v.toFixed(3));
+        });
+      }
+      window.addEventListener('scroll', updateHalos, { passive: true });
+      window.addEventListener('resize', updateHalos, { passive: true });
+      updateHalos();
+    }());
+  </script>
 
   <!-- ============================================================
        three.js scene — inline module, https import only (file:// safe)
