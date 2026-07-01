@@ -26,7 +26,7 @@
       --accent-2: #7b2ff7;    /* violet */
 
       /* A11y readability halo behind text (light, matches the airy bg) */
-      --scrim: rgba(244, 242, 238, 0.60);
+      --scrim: rgba(244, 242, 238, 0.32);
     }
 
     /* Accent gradient text for hero words */
@@ -91,6 +91,22 @@
     .hero-word { font-family: var(--font-serif); font-weight: 600; }
     .eyebrow-note { margin-top: var(--space-md); font-size: var(--step--1); letter-spacing: 0.04em; }
     .lead-tight { max-width: 46ch; }
+
+    /* Hero: tighter padding so the kinetic background shows around the content */
+    #hook {
+      padding-top: var(--space-md);
+      padding-bottom: var(--space-md);
+      --scrim: transparent; /* large dark text is readable on the light gradient without a halo */
+    }
+
+    /* Targeted halo for smaller body text that needs contrast support */
+    .lead-halo {
+      background: rgba(244, 242, 238, 0.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 14px;
+      padding: 0.6rem 1.4rem;
+    }
   </style>
 </head>
 
@@ -116,12 +132,12 @@
          ======================================================== -->
     <section class="section text-center" id="hook">
       <div class="section__inner reveal">
-        <p class="kicker">Cadence · for teams who ship</p>
+        <p class="kicker lead-halo" style="display:inline-block;">Cadence · for teams who ship</p>
         <h1 class="headline headline--hero">
           What if the <span class="hero-word grad">status meeting</span><br />
           never needed to happen?
         </h1>
-        <p class="lead lead-tight mx-auto">
+        <p class="lead lead-tight mx-auto lead-halo">
           Your best people lose <strong>400 hours a year</strong> to updates
           that could have been a single, calm signal.
         </p>
@@ -338,6 +354,30 @@
     );
     scene.add(points);
 
+    /* ---- Larger foreground blobs (pull the simulation into the foreground) ---- */
+    const BIG_COUNT = 18;
+    const bigPositions = new Float32Array(BIG_COUNT * 3);
+    for (let i = 0; i < BIG_COUNT; i++) {
+      bigPositions[i * 3 + 0] = (Math.random() - 0.5) * 14;
+      bigPositions[i * 3 + 1] = (Math.random() - 0.5) * 10;
+      bigPositions[i * 3 + 2] = 0.5 + Math.random() * 2.5; // close to camera
+    }
+    const bigGeo = new THREE.BufferGeometry();
+    bigGeo.setAttribute("position", new THREE.BufferAttribute(bigPositions, 3));
+    const bigPoints = new THREE.Points(
+      bigGeo,
+      new THREE.PointsMaterial({
+        size: 0.55,
+        map: makeDotTexture(),
+        color: new THREE.Color(0x4361ee),
+        transparent: true,
+        opacity: 0.28,
+        depthWrite: false,
+        sizeAttenuation: true,
+      })
+    );
+    scene.add(bigPoints);
+
     /* ---- Interaction: gentle mouse parallax ---- */
     const mouse = { x: 0, y: 0 };
     const target = { x: 0, y: 0 };
@@ -374,6 +414,10 @@
       // slow drift of the particle field
       points.rotation.z += dt * 0.01;
       points.position.y = Math.sin(gradientUniforms.uTime.value * 0.15) * 0.15;
+
+      // foreground blobs drift slightly faster, opposite phase
+      bigPoints.rotation.z -= dt * 0.007;
+      bigPoints.position.y = Math.sin(gradientUniforms.uTime.value * 0.18 + 1.2) * 0.22;
 
       renderer.render(scene, camera);
     }
