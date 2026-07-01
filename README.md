@@ -73,6 +73,14 @@ Character, Function, Structure, Style, Organise). Die genutzten Kernkarten:
 Ordner öffnen, `index.html` doppelklicken. Inhalte in den `.section`-Blöcken
 ersetzen, Palette im `<head>`-`<style>` anpassen. Fertig zum Präsentieren.
 
+## Skill: Präsentation erstellen
+
+Der Skill [`create-presentation`](.claude/skills/create-presentation/SKILL.md)
+wählt kontextabhängig das passende Template, kopiert es als Geschwister-Ordner
+und füllt die Sektionen entlang der Story-Struktur — unter Wahrung der A11y-
+und `file://`-Konventionen. Aufruf z.B. über „erstelle eine Präsentation /
+einen Pitch / eine Story-Seite".
+
 ## Quellen
 - Pip Decks — Storyteller Tactics: https://pipdecks.com/pages/storyteller-tactics
 - three.js Dokumentation: https://threejs.org/docs/
