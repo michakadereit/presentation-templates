@@ -584,13 +584,16 @@
         const rr = tr.cr + (BG.r - tr.cr) * mix;
         const gg = tr.cg + (BG.g - tr.cg) * mix;
         const bb = tr.cb + (BG.b - tr.cb) * mix;
+        // Non-active triangles are pushed far behind the scene (z=-10) so they
+        // cannot occlude the assembled icon regardless of their scatter z-position.
+        const finalZ = triIsActive ? cz : -10;
 
         for (let k = 0; k < 3; k++) {
           v.set(tr.off[k * 3], tr.off[k * 3 + 1], tr.off[k * 3 + 2]).applyQuaternion(q);
           const b = (i * 3 + k) * 3;
           pos[b]     = cxx + v.x;
           pos[b + 1] = cyy + v.y;
-          pos[b + 2] = cz  + v.z;
+          pos[b + 2] = finalZ + v.z;
           col[b]     = rr; col[b + 1] = gg; col[b + 2] = bb;
         }
       }
