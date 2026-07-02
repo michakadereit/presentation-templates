@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Micha Kadereit — From Backend Craft to AI Leadership</title>
+
+  <!-- Shared design foundation -->
+  <link rel="stylesheet" href="../shared/base.css" />
+
+  <!--
+    THE JOURNEY — Story-Struktur: "Man in a Hole" (Pip Decks / Storyteller Tactics)
+    Status quo -> Fall -> Struggle (mit Rolls Royce Moment) -> Turn -> Rise -> New Normal.
+    Optik: cinematisch, Stimmung wandert dunkel -> hell mit dem Scroll.
+    Kamera sinkt in einen Partikel-Tunnel hinab und steigt wieder auf.
+  -->
+  <style>
+    /* Palette-Override: Start dunkel, warmer Akzent für die Erlösung am Ende. */
+    :root {
+      --bg: #08090f;
+      --fg: #f3f0ea;
+      --muted: #9ca0b6;       /* A11y: aufgehellt (L .36) — hält .lead/.dim im
+                                 Aufhell-Übergang vor dem is-light-Flip ≥ AA */
+      --accent: #ffb26e;      /* warmes Licht = Hoffnung / Aufstieg */
+      --accent-2: #6ea8fe;    /* kühles Blau = Ausgangszustand */
+
+      /* A11y-Lesbarkeits-Halo hinter Text (dunkel, für helle Schrift). */
+      --scrim: rgba(6, 8, 14, 0.66);
+    }
+
+    /* Dynamische Farbanpassung an den Hintergrund:
+       Am Ende ("Neue Normalität") wird die Szene cremefarben. Ab ~90% Scroll
+       kippt <body class="is-light"> die Schrift auf dunkel, den Scrim auf hell
+       und den Akzent auf kontraststarkes Burnt-Orange — sonst wäre helle
+       Schrift auf Creme unlesbar (WCAG-Fail). Getrieben von der three.js-Szene. */
+    body.is-light {
+      --fg: #1c1509;
+      --muted: #574b39;
+      --accent: #9a4a12;      /* burnt orange — AA auf Creme */
+      --scrim: rgba(245, 238, 226, 0.66);
+    }
+
+    /* Weicher Übergang beim Umschalten hell/dunkel. */
+    .headline, .subhead, .lead, .kicker, .quote, .attribution,
+    .chapter-index, .dim, .accent, .stat { transition: color 0.45s var(--ease); }
+
+    .quote {
+      font-family: var(--font-serif);
+      font-size: var(--step-2);
+      line-height: 1.15;
+      font-style: italic;
+      text-wrap: balance;
+    }
+    .quote span { color: var(--accent); font-style: normal; }
+    .attribution { margin-top: var(--space-md); color: var(--muted); letter-spacing: 0.04em; }
+
+    .chapter-index {
+      font-family: var(--font-serif);
+      font-size: var(--step-2);
+      color: var(--accent);
+      opacity: 0.55;
+      display: block;
+      margin-bottom: var(--space-sm);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- three.js Hintergrundszene (rein dekorativ) -->
+  <canvas class="scene-canvas" aria-hidden="true"></canvas>
+
+  <!-- Scroll-Fortschrittsbalken -->
+  <div class="progress" aria-hidden="true"></div>
+
+  <!-- Sektions-Navigation -->
+  <nav class="nav-dots" aria-label="Chapters">
+    <a href="#status-quo" aria-label="The Craft"></a>
+    <a href="#fall" aria-label="The Shift"></a>
+    <a href="#struggle" aria-label="The Low Point"></a>
+    <a href="#turn" aria-label="The Turn"></a>
+    <a href="#rise" aria-label="The Climb"></a>
+    <a href="#new-normal" aria-label="The New Normal"></a>
+  </nav>
+
+  <main class="deck">
+
+    <!-- 1 — STATUS QUO · Story Hook: ruhiger, fast zu ruhiger Ausgangszustand -->
+    <section class="section" id="status-quo">
+      <div class="section__inner text-center reveal">
+        <span class="chapter-index">Chapter I</span>
+        <p class="kicker">Where it began</p>
+        <h1 class="headline">It ran. <span class="dim">Flawlessly.</span></h1>
+        <p class="lead mx-auto">
+          For nearly a decade I built Java backends that simply <strong>worked</strong> —
+          Spring Boot services, ELK observability, Docker Swarm, NATS. From insurance
+          products at Faktor Zehn to secure messaging at Zertificon, where I led a
+          chapter. Scalable, maintainable, resilient. I had mastered the craft —
+          and that was the exact moment the ground began to move.
+        </p>
+      </div>
+      <div class="scroll-hint">scroll</div>
+    </section>
+
+    <!-- 2 — THE FALL · Man in a Hole: der Absturz, Stimmung kippt -->
+    <section class="section" id="fall">
+      <div class="section__inner reveal">
+        <span class="chapter-index">Chapter II</span>
+        <p class="kicker">The shift</p>
+        <h2 class="subhead">Then the ground moved.</h2>
+        <p class="lead">
+          Almost overnight, the rules of software changed. AI could write code,
+          reason about systems, generate tests. The hand-crafted certainty that
+          takes years to earn suddenly felt like it might not be enough. For a
+          seasoned engineer, that is a quiet, unsettling kind of fall — not a
+          crash, but the slow realization that yesterday's mastery guarantees
+          nothing tomorrow.
+        </p>
+      </div>
+    </section>
+
+    <!-- 3 — THE STRUGGLE · tiefster Punkt + Rolls Royce Moment (sinnliches Detail) -->
+    <section class="section" id="struggle">
+      <div class="section__inner text-center reveal">
+        <span class="chapter-index">Chapter III</span>
+        <p class="kicker">The low point</p>
+        <!-- Rolls Royce Moment: ein konkretes, sinnliches Detail, das haften bleibt -->
+        <blockquote class="quote">
+          &bdquo;February <span>2024</span>. First week at <span>CGM ONE</span>.
+          A new domain — telemedicine, video consultations. A new stack —
+          OpenSearch, Filebeat, Ansible. And one open question no framework
+          could answer: will these AI tools <span>replace</span> me,
+          or <span>multiply</span> me?&ldquo;
+        </blockquote>
+        <p class="attribution">— the question I couldn't outsource</p>
+      </div>
+    </section>
+
+    <!-- 4 — THE TURN · die Wende / Entscheidung -->
+    <section class="section" id="turn">
+      <div class="section__inner reveal">
+        <span class="chapter-index">Chapter IV</span>
+        <p class="kicker">The turn</p>
+        <h2 class="subhead">One decision changed the course.</h2>
+        <p class="lead">
+          Instead of resisting the wave, I leaned all the way <em>in</em>. I put
+          Claude Code, GitHub Copilot and Devin to work in my daily flow — not as
+          toys, but as force multipliers. And I doubled down on the fundamentals
+          that make AI safe to trust: Clean Architecture, Domain-Driven Design,
+          Test-Driven and Spec-Driven Development with Playwright. The insight:
+          AI doesn't replace great engineers. It multiplies them.
+        </p>
+      </div>
+    </section>
+
+    <!-- 5 — THE RISE · Herausklettern, Stimmung hellt auf -->
+    <section class="section" id="rise">
+      <div class="section__inner text-center reveal">
+        <span class="chapter-index">Chapter V</span>
+        <p class="kicker">The climb</p>
+        <h2 class="headline">And suddenly, <span class="accent">it took off.</span></h2>
+        <p class="lead mx-auto">
+          I became an <strong>AI Champion</strong> at CGM — then a coach, helping
+          engineers adopt these tools with judgment. I started presenting, not only
+          to my own team but to others. I led two AI hackathons: one for my team,
+          one for another. The craft hadn't been replaced. It had found a new gear.
+        </p>
+      </div>
+    </section>
+
+    <!-- 6 — NEW NORMAL · Auflösung (hell) + Ausblick -->
+    <section class="section" id="new-normal">
+      <div class="section__inner text-center reveal">
+        <span class="chapter-index">Chapter VI</span>
+        <p class="kicker">The new normal</p>
+        <h2 class="headline">Not back. <span class="accent">Forward.</span></h2>
+        <div class="grid-3 stagger" style="margin-top: var(--space-lg); text-align:left;">
+          <div class="reveal" style="--i:0"><p class="stat accent" data-count-to="9">0</p><p class="dim">years mastering the backend craft.</p></div>
+          <div class="reveal" style="--i:1"><p class="stat accent" data-count-to="2">0</p><p class="dim">AI hackathons led — my team and another.</p></div>
+          <div class="reveal" style="--i:2"><p class="stat accent" data-count-to="3">0</p><p class="dim">AI CLIs in daily use: Claude Code, Copilot, Devin.</p></div>
+        </div>
+        <p class="lead mx-auto" style="margin-top: var(--space-lg);">
+          Deep engineering craft, amplified by AI leadership. The valley wasn't the
+          end of the story. It was its turning point.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Shared scroll behaviour (Reveal, Nav-Dots, Progress, window.__scrollProgress) -->
+  <script defer src="../shared/reveal.js"></script>
+
+  <!-- Count-up: die drei Finale-Zahlen zählen hoch, sobald sichtbar (file://-safe) -->
+  <script>
+    (function () {
+      "use strict";
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      function format(v, decimals) {
+        return decimals > 0
+          ? v.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+          : Math.round(v).toLocaleString("en-US");
+      }
+
+      function run(el) {
+        var to = parseFloat(el.getAttribute("data-count-to"));
+        var from = parseFloat(el.getAttribute("data-count-from") || "0");
+        var decimals = parseInt(el.getAttribute("data-decimals") || "0", 10);
+        var suffix = el.getAttribute("data-suffix") || "";
+        if (reduce) { el.textContent = format(to, decimals) + suffix; return; }
+
+        var dur = 1600, start = null;
+        function frame(t) {
+          if (start === null) start = t;
+          var p = Math.min((t - start) / dur, 1);
+          var eased = 1 - Math.pow(1 - p, 3);        // easeOutCubic
+          el.textContent = format(from + (to - from) * eased, decimals) + suffix;
+          if (p < 1) requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      }
+
+      var nums = document.querySelectorAll("[data-count-to]");
+      if (!("IntersectionObserver" in window)) { nums.forEach(run); return; }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { run(e.target); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.6 });
+      nums.forEach(function (n) { io.observe(n); });
+    })();
+  </script>
+
+  <!-- ===================================================================
+       three.js Szene — INLINE Modul, Import nur von absoluter HTTPS-URL,
+       damit die Seite per Doppelklick über file:// läuft.
+       Kamera fliegt durch einen Partikel-Tunnel, sinkt zur Mitte hinab
+       (tiefster/dunkelster Punkt) und steigt zum hellen Ende wieder auf.
+       =================================================================== -->
+  <script type="module">
+    import * as THREE from "https://esm.sh/three@0.169.0";
+
+    const canvas = document.querySelector(".scene-canvas");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // --- Renderer ---
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 400);
+
+    // --- Stimmungs-Keyframes: dunkel -> am dunkelsten (Mitte) -> hell ---
+    // p = geglätteter Scrollfortschritt 0..1
+    const MOOD = [
+      { p: 0.00, col: new THREE.Color("#141a2e") }, // Status quo: kühl, gedämpft
+      { p: 0.25, col: new THREE.Color("#0a0c16") }, // Fall: dunkler
+      { p: 0.45, col: new THREE.Color("#050507") }, // Struggle: fast schwarz (tiefster Punkt)
+      { p: 0.62, col: new THREE.Color("#1a1526") }, // Turn: erstes Violett
+      { p: 0.82, col: new THREE.Color("#3a2c3f") }, // Rise: wärmer
+      { p: 1.00, col: new THREE.Color("#f0e6d8") }, // New Normal: warmes Licht
+    ];
+    const moodColor = (p) => {
+      for (let i = 0; i < MOOD.length - 1; i++) {
+        const a = MOOD[i], b = MOOD[i + 1];
+        if (p <= b.p) {
+          const t = (p - a.p) / (b.p - a.p || 1);
+          return a.col.clone().lerp(b.col, Math.max(0, Math.min(1, t)));
+        }
+      }
+      return MOOD[MOOD.length - 1].col.clone();
+    };
+
+    scene.fog = new THREE.FogExp2(MOOD[0].col.clone(), 0.018);
+    scene.background = MOOD[0].col.clone();
+
+    // --- Partikel-Tunnel: Punkte auf einer Röhre entlang -z ---
+    const LENGTH = 260;          // Tunneltiefe
+    const COUNT = reduceMotion ? 2500 : 9000;
+    const positions = new Float32Array(COUNT * 3);
+    const colors = new Float32Array(COUNT * 3);
+    const cool = new THREE.Color("#6ea8fe");
+    const warm = new THREE.Color("#ffb26e");
+
+    for (let i = 0; i < COUNT; i++) {
+      const z = -Math.random() * LENGTH;
+      const angle = Math.random() * Math.PI * 2;
+      // Radius mit leichter Variation -> Tunnelwand mit Tiefe
+      const radius = 9 + Math.random() * 9;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      positions[i * 3 + 0] = x;
+      positions[i * 3 + 1] = y;
+      positions[i * 3 + 2] = z;
+
+      // Farbe entlang der Tiefe von kühl -> warm mischen
+      const mix = i / COUNT;
+      const c = cool.clone().lerp(warm, mix);
+      colors[i * 3 + 0] = c.r;
+      colors[i * 3 + 1] = c.g;
+      colors[i * 3 + 2] = c.b;
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+    const mat = new THREE.PointsMaterial({
+      size: 0.18,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.9,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      sizeAttenuation: true,
+    });
+    const points = new THREE.Points(geo, mat);
+    scene.add(points);
+
+    // --- Kamerapfad: Reise nach vorn (-z), Abtauchen zur Mitte, Aufstieg zum Ende ---
+    // y(p) = rise*p  -  DIP*sin(pi*p)   -> p=0:0 · Mitte: negativ (unten) · p=1: rise (oben)
+    const DIP = 7.0;   // Tiefe des Absinkens
+    const RISE = 5.0;  // Endhöhe (Aufstieg ins Licht)
+    const cameraY = (p) => RISE * p - DIP * Math.sin(Math.PI * p);
+    const cameraZ = (p) => 8 - p * (LENGTH - 40); // reist durch den Tunnel
+
+    // --- Geglätteter Scrollwert (Damping gegen Ruckeln) ---
+    let smooth = 0;
+    const target = () => (typeof window.__scrollProgress === "number" ? window.__scrollProgress : 0);
+
+    function applyCamera(p) {
+      camera.position.set(0, cameraY(p), cameraZ(p));
+      // Blickrichtung: beim Abtauchen nach unten, beim Aufstieg nach oben schauen
+      const lookY = cameraY(Math.min(1, p + 0.12)) + (p < 0.45 ? -2.5 : 2.0);
+      camera.lookAt(0, lookY, cameraZ(p) - 20);
+
+      const col = moodColor(p);
+      scene.background.copy(col);
+      scene.fog.color.copy(col);
+      // Nebel lichtet sich zum hellen Ende hin
+      scene.fog.density = 0.026 - 0.016 * p;
+
+      // Dynamische A11y-Farbanpassung: sobald die Szene hell wird, kippt die
+      // Schrift auf dunkel (siehe CSS `body.is-light`) — hält den Kontrast AA.
+      document.body.classList.toggle("is-light", p > 0.9);
+    }
+
+    function render() {
+      renderer.render(scene, camera);
+    }
+
+    if (reduceMotion) {
+      // Statisch: einmal an aktueller Scrollposition zeichnen, kein Loop/Idle-Motion.
+      smooth = target();
+      applyCamera(smooth);
+      render();
+      window.addEventListener("scroll", () => { applyCamera(target()); render(); }, { passive: true });
+    } else {
+      const clock = new THREE.Clock();
+      function loop() {
+        requestAnimationFrame(loop);
+        smooth += (target() - smooth) * 0.06; // Damping
+        applyCamera(smooth);
+        // dezente Eigenbewegung: Tunnel rotiert minimal, lebt
+        points.rotation.z = clock.getElapsedTime() * 0.02;
+        render();
+      }
+      loop();
+    }
+
+    // --- Resize ---
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      render();
+    });
+  </script>
+</body>
+</html>
