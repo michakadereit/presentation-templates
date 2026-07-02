@@ -78,12 +78,37 @@
 
     <!-- 1. HOOK -->
     <section class="section" id="noise">
-      <!-- Copy folgt in TICKET-004 -->
+      <div class="section__inner text-center">
+        <p class="kicker reveal">Praxisalltag</p>
+        <h1 class="headline reveal" style="--reveal-delay:80ms">
+          Das Telefon klingelt.<br />
+          Die Akte fehlt.<br />
+          Fünf Systeme — <span class="hook">kein Zusammenhang</span>.
+        </h1>
+        <p class="lead mx-auto reveal" style="--reveal-delay:200ms">
+          Alles ist schon da — nur verstreut. Drei Farben, neun Werkzeuge, eine Plattform.
+          Scrolle und sieh zu, wie sich die Teile fügen.
+        </p>
+        <div class="rule reveal" style="--reveal-delay:320ms"></div>
+      </div>
+      <p class="scroll-hint">Die Plattform entdecken ↓</p>
     </section>
 
     <!-- 2. WHAT'S IT ABOUT? -->
     <section class="section" id="idea">
-      <!-- Copy folgt in TICKET-004 -->
+      <div class="section__inner text-center">
+        <p class="kicker reveal brand-cyan">CGM one</p>
+        <h2 class="subhead reveal" style="--reveal-delay:80ms">
+          Die KI-native Praxisplattform.<br />
+          <span class="brand-cyan">Praxissoftware, die sich Ihnen anpasst.</span>
+        </h2>
+        <p class="lead mx-auto reveal" style="--reveal-delay:220ms">
+          Ein Alphabet aus drei Farben: <span class="brand-navy">Navy ist das Fundament</span> —
+          stabil, verlässlich, der Rahmen, der trägt.
+          <span class="brand-gold">Gold ist der Mensch</span> — warm, direkt, unübersehbar.
+          <span class="brand-cyan">Cyan ist der Fluss</span> — vernetzt, schnell, immer da.
+        </p>
+      </div>
     </section>
 
     <!-- 3. CLUSTER I: Das Fundament -->
@@ -114,6 +139,7 @@
   <!-- three.js Icon-Morph-Szene — inline module, HTTPS-Import only (file://-safe) -->
   <script type="module">
     import * as THREE from "https://esm.sh/three@0.169.0";
+    import { SVGLoader } from "https://esm.sh/three@0.169.0/examples/jsm/loaders/SVGLoader.js";
 
     // ─── TICKET-002: Icon-Geometrien + Keyframe-Kontrakt ────────────────────
     //
@@ -233,10 +259,11 @@
       { id: "plattform",       kind: "grid", icons: ICON_SEQUENCE     },
     ];
 
-    // ─── Renderer + Kamera (Engine-Logik folgt in TICKET-003) ───────────────
+    // ─── TICKET-003: three.js Morph-Engine ──────────────────────────────────
 
     const canvas = document.querySelector(".scene-canvas");
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const BG = new THREE.Color("#04070d");
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -247,14 +274,235 @@
     const camera = new THREE.OrthographicCamera(-aspect, aspect, 1, -1, -20, 20);
     camera.position.z = 5;
 
-    renderer.render(scene, camera);
+    // ── Helpers ──────────────────────────────────────────────────────────────
+    const smooth = (a, b, x) => {
+      const t = Math.min(Math.max((x - a) / (b - a), 0), 1);
+      return t * t * (3 - 2 * t);
+    };
+    const FILL_TO_KIND = { "#003366": 0, "#FCCF4C": 1, "#2BA1EA": 2 };
 
+    // ── Step 3: Triangulate all icons via SVGLoader ───────────────────────────
+    const loader = new SVGLoader();
+    const GROUT = 0.88;
+    const SCALE = 0.62;
+
+    let tris = [];
+
+    for (const [iconName, icon] of Object.entries(ICONS)) {
+      const half = icon.viewBox / 2;
+
+      for (const pathData of icon.paths) {
+        const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${icon.viewBox} ${icon.viewBox}"><path d="${pathData.d}"/></svg>`;
+        let parsed;
+        try { parsed = loader.parse(svgStr); } catch (e) { console.warn("SVGLoader error", iconName, e); continue; }
+        if (!parsed.paths.length) continue;
+
+        const shapes = SVGLoader.createShapes(parsed.paths[0]);
+        const fill = pathData.fill.toUpperCase();
+        const kind = FILL_TO_KIND[fill] ?? 0;
+        const col3 = new THREE.Color(pathData.fill);
+
+        for (const shape of shapes) {
+          const geo = new THREE.ShapeGeometry(shape, 6).toNonIndexed();
+          const posArr = geo.attributes.position.array;
+
+          for (let vi = 0; vi < posArr.length; vi += 9) {
+            const verts = [];
+            for (let k = 0; k < 3; k++) {
+              const svgX = posArr[vi + k * 3];
+              const svgY = posArr[vi + k * 3 + 1];
+              verts.push([
+                (svgX / half - 1) * SCALE,
+                -(svgY / half - 1) * SCALE,
+              ]);
+            }
+
+            const cx = (verts[0][0] + verts[1][0] + verts[2][0]) / 3;
+            const cy = (verts[0][1] + verts[1][1] + verts[2][1]) / 3;
+
+            const area = Math.abs(
+              (verts[1][0] - verts[0][0]) * (verts[2][1] - verts[0][1]) -
+              (verts[2][0] - verts[0][0]) * (verts[1][1] - verts[0][1])
+            ) / 2;
+            if (area < 1e-6) continue;
+
+            const off = [];
+            for (let k = 0; k < 3; k++) {
+              off.push((verts[k][0] - cx) * GROUT, (verts[k][1] - cy) * GROUT, 0);
+            }
+
+            const dx = cx, dy = cy, dl = Math.hypot(dx, dy) || 1;
+            const spread = 0.55 + Math.random() * 1.1;
+            let bx = 0, by = 0;
+            if (kind === 0) { bx = -0.35; by = -0.10; }
+            else if (kind === 1) { bx = 0.10; by = 0.55; }
+            else { bx = 0.15; by = -0.45; }
+            const sx = cx + (dx / dl) * spread + bx + (Math.random() - 0.5) * 0.4;
+            const sy = cy + (dy / dl) * spread + by + (Math.random() - 0.5) * 0.4;
+            const sz = (Math.random() - 0.5) * 3.0;
+
+            const axis = new THREE.Vector3(
+              (Math.random() - 0.5) * 0.8,
+              (Math.random() - 0.5) * 0.8,
+              1
+            ).normalize();
+
+            tris.push({
+              hx: cx, hy: cy,
+              sx, sy, sz,
+              off,
+              axis,
+              spin: (1.4 + Math.random() * 2.2) * (Math.random() < 0.5 ? -1 : 1),
+              phase: Math.random(),
+              phaseR: Math.random() * Math.PI * 2,
+              cr: col3.r, cg: col3.g, cb: col3.b,
+              kind,
+              iconName,
+            });
+          }
+          geo.dispose();
+        }
+      }
+    }
+
+    if (tris.length > 2500) tris = tris.slice(0, 2500);
+    console.log(`CGM one: ${tris.length} triangles across ${Object.keys(ICONS).length} icons`);
+
+    // ── Step 4: Pre-compute home positions for all 12 keyframes ──────────────
+    const fieldHomes = new Float32Array(tris.length * 3);
+    for (let i = 0; i < tris.length; i++) {
+      const angle = (i / tris.length) * Math.PI * 2 * 7.3;
+      const r = 0.25 + (i % 17) / 17 * 0.55;
+      fieldHomes[i * 3]     = Math.cos(angle) * r * 1.2;
+      fieldHomes[i * 3 + 1] = Math.sin(angle) * r * 0.85;
+      fieldHomes[i * 3 + 2] = 0;
+    }
+
+    const GRID_SCALE = 0.33;
+    const CELL = 0.48;
+
+    function buildHomePositions(kfIdx) {
+      const kf = KEYFRAMES[kfIdx];
+      const homes = new Float32Array(tris.length * 3);
+
+      for (let i = 0; i < tris.length; i++) {
+        const tr = tris[i];
+
+        if (kf.kind === "scatter") {
+          homes[i * 3] = tr.sx; homes[i * 3 + 1] = tr.sy; homes[i * 3 + 2] = tr.sz;
+
+        } else if (kf.kind === "field") {
+          homes[i * 3]     = fieldHomes[i * 3];
+          homes[i * 3 + 1] = fieldHomes[i * 3 + 1];
+          homes[i * 3 + 2] = fieldHomes[i * 3 + 2];
+
+        } else if (kf.kind === "icon") {
+          if (tr.iconName === kf.icon) {
+            homes[i * 3] = tr.hx; homes[i * 3 + 1] = tr.hy; homes[i * 3 + 2] = 0;
+          } else {
+            homes[i * 3] = tr.sx; homes[i * 3 + 1] = tr.sy; homes[i * 3 + 2] = tr.sz;
+          }
+
+        } else if (kf.kind === "grid") {
+          const iconIdx = ICON_SEQUENCE.indexOf(tr.iconName);
+          if (iconIdx >= 0) {
+            const row = Math.floor(iconIdx / 3);
+            const col = iconIdx % 3;
+            const cellX = (col - 1) * CELL;
+            const cellY = (1 - row) * CELL;
+            homes[i * 3]     = tr.hx * GRID_SCALE + cellX;
+            homes[i * 3 + 1] = tr.hy * GRID_SCALE + cellY;
+            homes[i * 3 + 2] = 0;
+          } else {
+            homes[i * 3] = tr.sx; homes[i * 3 + 1] = tr.sy; homes[i * 3 + 2] = tr.sz;
+          }
+        }
+      }
+      return homes;
+    }
+
+    const allHomes = KEYFRAMES.map((_, ki) => buildHomePositions(ki));
+
+    // ── Step 5: BufferGeometry + mesh ─────────────────────────────────────────
+    const n = tris.length;
+    const pos = new Float32Array(n * 9);
+    const col = new Float32Array(n * 9);
+    const geo = new THREE.BufferGeometry();
+    const posAttr = new THREE.BufferAttribute(pos, 3);
+    const colAttr  = new THREE.BufferAttribute(col, 3);
+    geo.setAttribute("position", posAttr);
+    geo.setAttribute("color", colAttr);
+    const mat = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide });
+    const mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
+
+    // ── Step 6: Render loop ───────────────────────────────────────────────────
+    const q = new THREE.Quaternion();
+    const v = new THREE.Vector3();
+    const clock = new THREE.Clock();
+
+    function frame() {
+      const elapsed = clock.getElapsedTime();
+      const sp = window.__scrollProgress || 0;
+
+      const tTotal = sp * (KEYFRAMES.length - 1);
+      const iKf = Math.min(Math.floor(tTotal), KEYFRAMES.length - 2);
+      const f = tTotal - iKf;
+
+      // Dissolution: 0 = sharp, 1 = fully scattered
+      const d = reduce ? 0 : (1 - Math.abs(1 - 2 * f));
+
+      // Which keyframe are we assembling toward?
+      const targetHomes = f < 0.5 ? allHomes[iKf] : allHomes[iKf + 1];
+
+      for (let i = 0; i < n; i++) {
+        const tr = tris[i];
+        const lo = 0.26 + tr.phase * 0.26;
+        const a = 1 - smooth(lo, 1.0, d);  // 1 = assembled, 0 = scattered
+
+        const idle = reduce ? 0 : Math.sin(elapsed * 0.35 + tr.phaseR) * 0.015;
+        q.setFromAxisAngle(tr.axis, tr.spin * (1 - a) + idle);
+
+        const hx = targetHomes[i * 3];
+        const hy = targetHomes[i * 3 + 1];
+        const hz = targetHomes[i * 3 + 2];
+        const cxx = tr.sx + (hx - tr.sx) * a;
+        const cyy = tr.sy + (hy - tr.sy) * a;
+        const cz  = hz === 0 ? tr.sz * (1 - a) : tr.sz + (hz - tr.sz) * a;
+
+        const mix = (1 - a) * 0.9;
+        const rr = tr.cr + (BG.r - tr.cr) * mix;
+        const gg = tr.cg + (BG.g - tr.cg) * mix;
+        const bb = tr.cb + (BG.b - tr.cb) * mix;
+
+        for (let k = 0; k < 3; k++) {
+          v.set(tr.off[k * 3], tr.off[k * 3 + 1], tr.off[k * 3 + 2]).applyQuaternion(q);
+          const b = (i * 3 + k) * 3;
+          pos[b]     = cxx + v.x;
+          pos[b + 1] = cyy + v.y;
+          pos[b + 2] = cz  + v.z;
+          col[b]     = rr; col[b + 1] = gg; col[b + 2] = bb;
+        }
+      }
+
+      posAttr.needsUpdate = true;
+      colAttr.needsUpdate = true;
+      renderer.render(scene, camera);
+      if (!reduce) requestAnimationFrame(frame);
+    }
+
+    if (reduce) { frame(); }
+    else requestAnimationFrame(frame);
+
+    // ── Step 7: Resize handler ────────────────────────────────────────────────
+    let resizeTimer = null;
     window.addEventListener("resize", () => {
       aspect = window.innerWidth / window.innerHeight;
       camera.left = -aspect; camera.right = aspect;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.render(scene, camera);
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => { if (reduce) frame(); }, 180);
     }, { passive: true });
   </script>
 </body>
