@@ -57,6 +57,28 @@
 
     .glow { text-shadow: 0 0 60px color-mix(in srgb, var(--accent) 45%, transparent); }
     .hook { font-family: var(--font-serif); font-style: italic; color: var(--accent-2); }
+
+    /* ── Icon-Caption active/inactive states ─────────────────────────── */
+    .icon-caption {
+      margin-top: var(--space-md);
+      padding: var(--space-sm) var(--space-md);
+      border-left: 2px solid transparent;
+      transition: opacity 0.5s ease, transform 0.45s ease, border-color 0.45s ease;
+    }
+    /* Revealed but not active: dimmed — overrides .reveal.is-visible opacity:1 */
+    .icon-caption.is-visible:not(.is-active) {
+      opacity: 0.28;
+      transform: scale(0.97) !important;
+    }
+    /* Active: highlighted with accent border */
+    .icon-caption.is-visible.is-active {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+      border-left-color: var(--accent);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .icon-caption { transition: none; }
+    }
   </style>
 </head>
 <body>
@@ -508,6 +530,7 @@
     const q = new THREE.Quaternion();
     const v = new THREE.Vector3();
     const clock = new THREE.Clock();
+    let lastActiveKfId = null;
 
     function frame() {
       const elapsed = clock.getElapsedTime();
@@ -523,9 +546,18 @@
       // Which keyframe are we assembling toward?
       const targetHomes = f < 0.5 ? allHomes[iKf] : allHomes[iKf + 1];
 
+      // Update active icon caption — driven by engine keyframe, not DOM scroll position
+      const activeKfId = KEYFRAMES[f < 0.5 ? iKf : Math.min(iKf + 1, KEYFRAMES.length - 1)].id;
+      if (activeKfId !== lastActiveKfId) {
+        document.querySelectorAll("[data-keyframe]").forEach(el => {
+          el.classList.toggle("is-active", el.dataset.keyframe === activeKfId);
+        });
+        lastActiveKfId = activeKfId;
+      }
+
       for (let i = 0; i < n; i++) {
         const tr = tris[i];
-        const lo = 0.26 + tr.phase * 0.26;
+        const lo = 0.32 + tr.phase * 0.22;  // wider rest zone so each icon rests before dissolving
         const a = 1 - smooth(lo, 1.0, d);  // 1 = assembled, 0 = scattered
 
         const idle = reduce ? 0 : Math.sin(elapsed * 0.35 + tr.phaseR) * 0.015;
@@ -559,8 +591,13 @@
       if (!reduce) requestAnimationFrame(frame);
     }
 
-    if (reduce) { frame(); }
-    else requestAnimationFrame(frame);
+    if (reduce) {
+      frame();
+      // Re-render on scroll so captions + static frame stay in sync
+      window.addEventListener("scroll", frame, { passive: true });
+    } else {
+      requestAnimationFrame(frame);
+    }
 
     // ── Step 7: Resize handler ────────────────────────────────────────────────
     let resizeTimer = null;
@@ -572,6 +609,27 @@
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => { if (reduce) frame(); }, 180);
     }, { passive: true });
+
+    // ── Nav-dot fix: reveal.js uses threshold:0.5 which never fires for >200vh
+    //    sections. Override with viewport-midpoint detection.
+    const pageSections = document.querySelectorAll(".section[id]");
+    const navLinks = {};
+    document.querySelectorAll(".nav-dots a").forEach(a => {
+      navLinks[a.getAttribute("href").slice(1)] = a;
+    });
+    function updateNavDots() {
+      const mid = window.scrollY + window.innerHeight / 2;
+      let activeId = null;
+      pageSections.forEach(s => {
+        if (mid >= s.offsetTop && mid < s.offsetTop + s.offsetHeight) activeId = s.id;
+      });
+      if (activeId && navLinks[activeId]) {
+        Object.values(navLinks).forEach(a => a.classList.remove("is-active"));
+        navLinks[activeId].classList.add("is-active");
+      }
+    }
+    updateNavDots();
+    window.addEventListener("scroll", updateNavDots, { passive: true });
   </script>
 </body>
 </html>
