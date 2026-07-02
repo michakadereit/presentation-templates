@@ -380,6 +380,7 @@
 
     for (const [iconName, icon] of Object.entries(ICONS)) {
       const half = icon.viewBox / 2;
+      let pathIdx = 0;
 
       for (const pathData of icon.paths) {
         const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${icon.viewBox} ${icon.viewBox}"><path d="${pathData.d}"/></svg>`;
@@ -448,10 +449,12 @@
               cr: col3.r, cg: col3.g, cb: col3.b,
               kind,
               iconName,
+              pathIdx,
             });
           }
           geo.dispose();
         }
+        pathIdx++;
       }
     }
 
@@ -488,7 +491,7 @@
 
         } else if (kf.kind === "icon") {
           if (tr.iconName === kf.icon) {
-            homes[i * 3] = tr.hx; homes[i * 3 + 1] = tr.hy; homes[i * 3 + 2] = 0;
+            homes[i * 3] = tr.hx; homes[i * 3 + 1] = tr.hy; homes[i * 3 + 2] = tr.pathIdx * 0.004;
           } else {
             homes[i * 3] = tr.sx; homes[i * 3 + 1] = tr.sy; homes[i * 3 + 2] = tr.sz;
           }
@@ -555,12 +558,19 @@
         lastActiveKfId = activeKfId;
       }
 
+      // Which keyframe are triangles being assembled toward?
+      const kfTarget = KEYFRAMES[f < 0.5 ? iKf : Math.min(iKf + 1, KEYFRAMES.length - 1)];
+
       for (let i = 0; i < n; i++) {
         const tr = tris[i];
         const lo = 0.32 + tr.phase * 0.22;  // wider rest zone so each icon rests before dissolving
         const a = 1 - smooth(lo, 1.0, d);  // 1 = assembled, 0 = scattered
 
-        const idle = reduce ? 0 : Math.sin(elapsed * 0.35 + tr.phaseR) * 0.015;
+        // Non-active triangles for icon keyframes are hidden (mix=1 → BG color)
+        const triIsActive = kfTarget.kind !== "icon" || tr.iconName === kfTarget.icon;
+
+        // Idle wobble fades to zero as triangle assembles (stops when fully placed)
+        const idle = reduce ? 0 : Math.sin(elapsed * 0.35 + tr.phaseR) * 0.015 * (1 - a);
         q.setFromAxisAngle(tr.axis, tr.spin * (1 - a) + idle);
 
         const hx = targetHomes[i * 3];
@@ -570,7 +580,7 @@
         const cyy = tr.sy + (hy - tr.sy) * a;
         const cz  = hz === 0 ? tr.sz * (1 - a) : tr.sz + (hz - tr.sz) * a;
 
-        const mix = (1 - a) * 0.9;
+        const mix = triIsActive ? (1 - a) * 0.9 : 1.0;
         const rr = tr.cr + (BG.r - tr.cr) * mix;
         const gg = tr.cg + (BG.g - tr.cg) * mix;
         const bb = tr.cb + (BG.b - tr.cb) * mix;
