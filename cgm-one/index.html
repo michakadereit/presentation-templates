@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CGM one — Aus Teilen wird die Plattform</title>
+
+  <!-- Shared design foundation + scroll behaviour (file://-safe, non-module) -->
+  <link rel="stylesheet" href="../shared/base.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet" />
+
+  <!--
+    Template: CGM one — Aus Teilen wird die Plattform
+    Story-Struktur (Storyteller Tactics): Hook → What's It About? →
+      Show & Tell ×3 (je 3 Icons pro Cluster) → Full Circle.
+    Visualwelt: Neun CGM-Produkt-Icons aus geometrischen Grundformen —
+      beim Scrollen zerfallen ihre Dreiecke (radialer Burst, farb-abhängiger
+      Bias) und finden sich im nächsten Keyframe als neues Icon zusammen.
+      Farb-Alphabet: Navy #003366 (Fundament), Gold #FCCF4C (Mensch),
+      Cyan #2BA1EA (Fluss).
+  -->
+  <style>
+    :root {
+      --bg: #04070d;
+      --fg: #f3f6fa;
+      --muted: #9fb0c4;
+      --accent: #2ba1ea;      /* CGM Cyan */
+      --accent-2: #fccf4c;    /* CGM Gold */
+      --scrim: rgba(4, 7, 13, 0.74);
+    }
+    body {
+      background:
+        radial-gradient(130% 100% at 50% -20%, #0a1526 0%, #04070d 58%);
+    }
+
+    .brand-navy { color: #4d86c4; }
+    .brand-gold  { color: var(--accent-2); }
+    .brand-cyan  { color: var(--accent); }
+
+    .rule { width: 64px; height: 3px; background: var(--accent); margin: var(--space-md) auto 0; }
+    .rule--gold { background: var(--accent-2); }
+    .rule--navy { background: #003366; }
+
+    .lead, .label { color: #cfdbe9; }
+    .label { font-size: var(--step-0); color: var(--muted); margin-top: var(--space-sm); }
+
+    .cta {
+      display: inline-block; margin-top: var(--space-md);
+      padding: 0.9em 1.8em; border: 1.5px solid var(--accent);
+      border-radius: 999px; color: var(--accent); font-weight: 600;
+      letter-spacing: 0.04em; text-decoration: none;
+      transition: background 0.3s var(--ease), color 0.3s var(--ease);
+    }
+    .cta:hover { background: var(--accent); color: #032033; }
+
+    .glow { text-shadow: 0 0 60px color-mix(in srgb, var(--accent) 45%, transparent); }
+    .hook { font-family: var(--font-serif); font-style: italic; color: var(--accent-2); }
+  </style>
+</head>
+<body>
+  <!-- three.js background: die Icon-Morph-Szene -->
+  <canvas class="scene-canvas" aria-hidden="true"></canvas>
+
+  <div class="progress"></div>
+
+  <nav class="nav-dots" aria-label="Sektionen">
+    <a href="#noise"      aria-label="Das Rauschen"></a>
+    <a href="#idea"       aria-label="Die Idee"></a>
+    <a href="#fundament"  aria-label="Das Fundament"></a>
+    <a href="#mitarbeiter" aria-label="Digitale Mitarbeiter"></a>
+    <a href="#patient"    aria-label="Draht zum Patienten"></a>
+    <a href="#plattform"  aria-label="Die Plattform"></a>
+  </nav>
+
+  <main class="deck">
+
+    <!-- 1. HOOK -->
+    <section class="section" id="noise">
+      <!-- Copy folgt in TICKET-004 -->
+    </section>
+
+    <!-- 2. WHAT'S IT ABOUT? -->
+    <section class="section" id="idea">
+      <!-- Copy folgt in TICKET-004 -->
+    </section>
+
+    <!-- 3. CLUSTER I: Das Fundament -->
+    <section class="section" id="fundament">
+      <!-- Copy folgt in TICKET-004 -->
+    </section>
+
+    <!-- 4. CLUSTER II: Digitale Mitarbeiter -->
+    <section class="section" id="mitarbeiter">
+      <!-- Copy folgt in TICKET-004 -->
+    </section>
+
+    <!-- 5. CLUSTER III: Draht zum Patienten -->
+    <section class="section" id="patient">
+      <!-- Copy folgt in TICKET-004 -->
+    </section>
+
+    <!-- 6. FULL CIRCLE -->
+    <section class="section" id="plattform">
+      <!-- Copy folgt in TICKET-004 -->
+    </section>
+
+  </main>
+
+  <!-- Shared scroll behaviour: reveals, nav dots, progress, window.__scrollProgress -->
+  <script defer src="../shared/reveal.js"></script>
+
+  <!-- three.js Icon-Morph-Szene — inline module, HTTPS-Import only (file://-safe) -->
+  <script type="module">
+    import * as THREE from "https://esm.sh/three@0.169.0";
+
+    const canvas = document.querySelector(".scene-canvas");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    let aspect = window.innerWidth / window.innerHeight;
+    const camera = new THREE.OrthographicCamera(-aspect, aspect, 1, -1, -20, 20);
+    camera.position.z = 5;
+
+    // Placeholder: Engine-Logik folgt in TICKET-003
+    renderer.render(scene, camera);
+
+    window.addEventListener("resize", () => {
+      aspect = window.innerWidth / window.innerHeight;
+      camera.left = -aspect; camera.right = aspect;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.render(scene, camera);
+    }, { passive: true });
+  </script>
+</body>
+</html>
