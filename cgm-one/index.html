@@ -115,6 +115,126 @@
   <script type="module">
     import * as THREE from "https://esm.sh/three@0.169.0";
 
+    // ─── TICKET-002: Icon-Geometrien + Keyframe-Kontrakt ────────────────────
+    //
+    // Alle Pfad-Koordinaten im SVG-Raum (0..28, y-down).
+    // Normalisierung in der Engine (TICKET-003):
+    //   world_x = (svg_x / 14 - 1) * 0.7    →  [-0.7, +0.7]
+    //   world_y = (1 - svg_y / 14) * 0.7    →  y invertiert (SVG y-down → three.js y-up)
+    //
+    // videosprechstunde hat viewBox 0 0 29 29 mit Pfad-Offset (0.332, 0.666) —
+    // die Engine normalisiert über 14.5 statt 14 (viewBox-Mittelpunkt).
+    //
+    // Farb-kind-Zuordnung (für farb-abhängigen Scatter-Bias):
+    //   navy  #003366 → kind 0   (nach hinten/links)
+    //   gold  #FCCF4C → kind 1   (steigt auf)
+    //   cyan  #2BA1EA → kind 2   (fließt nach unten)
+
+    const ICONS = {
+      medistar: {
+        viewBox: 28,
+        paths: [
+          { d: "M14 27.9991C17.713 27.9991 21.274 26.5242 23.8995 23.8988C26.525 21.2733 28 17.7125 28 13.9996C28 10.2867 26.525 6.72581 23.8995 4.10038C21.274 1.47495 17.713 -4.42761e-08 14 0L14 13.9996L14 27.9991Z", fill: "#FCCF4C" },
+          { d: "M14 27.9991C10.287 27.9991 6.72601 26.5242 4.1005 23.8988C1.475 21.2733 -1.0329e-07 17.7125 0 13.9996C1.0329e-07 10.2867 1.475 6.72581 4.10051 4.10038C6.72601 1.47495 10.287 -4.42761e-08 14 0L14 13.9996L14 27.9991Z", fill: "#003366" },
+          { d: "M1.22392e-06 14.0004C1.54852e-06 10.2875 1.475 6.72666 4.10051 4.10124C6.72602 1.47581 10.287 0.000857039 14 0.000857083C17.713 0.000857127 21.274 1.47581 23.8995 4.10124C26.525 6.72666 28 10.2875 28 14.0004L14 14.0004L1.22392e-06 14.0004Z", fill: "#2BA1EA" },
+        ],
+      },
+      clickdoc: {
+        viewBox: 28,
+        paths: [
+          { d: "M14.0081 7.69897L7.70703 14L14.0081 20.301L20.3091 14L14.0081 7.69897Z", fill: "#003366" },
+          { d: "M28 14V28H14L28 14Z", fill: "#2BA1EA" },
+          { d: "M14 0H28V14L14 0Z", fill: "#FCCF4C" },
+          { d: "M14 28H0V14L14 28Z", fill: "#003366" },
+        ],
+      },
+      videosprechstunde: {
+        viewBox: 29,   // viewBox 0 0 29 29; Pfade haben Offset 0.332 / 0.666
+        paths: [
+          { d: "M0.332031 0.666626L14.43 14.6666L0.332031 28.6666V0.666626Z", fill: "#003366" },
+          { d: "M28.332 14.6666H14.332V0.763916L28.332 14.6666Z", fill: "#FCCF4C" },
+          { d: "M14.332 28.5693V14.6666H28.332L14.332 28.5693Z", fill: "#2BA1EA" },
+        ],
+      },
+      dokuassistent: {
+        viewBox: 28,
+        paths: [
+          { d: "M28 14H14V0L28 14Z", fill: "#003366" },
+          { d: "M14 14H0V28H14V14Z", fill: "#003366" },
+          { d: "M14 0H0V14H14V0Z", fill: "#2BA1EA" },
+          { d: "M28 14H14V28H28V14Z", fill: "#FCCF4C" },
+        ],
+      },
+      telefonassistent: {
+        viewBox: 28,
+        paths: [
+          { d: "M14 28C6.265 28 0 21.735 0 14C0 6.265 6.265 0 14 0V28Z", fill: "#003366" },
+          { d: "M20.997 7.00008L13.998 13.999L20.997 20.998L27.9959 13.999L20.997 7.00008Z", fill: "#2BA1EA" },
+          { d: "M14.0028 7.00106L7.00391 14L14.0028 20.9989L21.0018 14L14.0028 7.00106Z", fill: "#FCCF4C" },
+        ],
+      },
+      "ti-messenger": {
+        viewBox: 28,
+        paths: [
+          { d: "M13.9998 13.9997V0C6.26491 0 0 6.26488 0 13.9997H13.9998Z", fill: "#2BA1EA" },
+          { d: "M13.9998 13.9998H0C0 21.7346 6.26491 27.9995 13.9998 27.9995V13.9998Z", fill: "#FCCF4C" },
+          { d: "M14 13.9997H27.9998C27.9998 6.26488 21.7349 0 14 0V13.9997Z", fill: "#003366" },
+          { d: "M14 13.9999V27.9996H27.9998V13.9999H14Z", fill: "#003366" },
+        ],
+      },
+      onlinerezeption: {
+        viewBox: 28,
+        paths: [
+          { d: "M14 28V14H28L14 28Z", fill: "#2BA1EA" },
+          { d: "M14 0V14H0L14 0Z", fill: "#2BA1EA" },
+          { d: "M28 0H14V14H28V0Z", fill: "#FCCF4C" },
+          { d: "M14 14H0V28H14V14Z", fill: "#003366" },
+        ],
+      },
+      checkin: {
+        viewBox: 28,
+        paths: [
+          { d: "M13.9943 27.9979L27.9922 14L13.9943 0.00211608L-0.00358034 14L13.9943 27.9979Z", fill: "#003366" },
+          { d: "M13.9961 28H-0.00390625V14L13.9961 28Z", fill: "#FCCF4C" },
+          { d: "M27.9961 14H13.9961V0L27.9961 14Z", fill: "#2BA1EA" },
+        ],
+      },
+      ambulapps: {
+        viewBox: 28,
+        paths: [
+          { d: "M14 14V28H0L14 14Z", fill: "#003366" },
+          { d: "M0 28V14H14L0 28Z", fill: "#FCCF4C" },
+          { d: "M14 14V28C21.735 28 28 21.735 28 14H14Z", fill: "#2BA1EA" },
+          { d: "M14 14H28C28 6.265 21.735 0 14 0V14Z", fill: "#2BA1EA" },
+        ],
+      },
+    };
+
+    // Reihenfolge: Cluster I → Cluster II → Cluster III
+    const ICON_SEQUENCE = [
+      "medistar", "dokuassistent", "ti-messenger",        // Cluster I: Das Fundament
+      "telefonassistent", "onlinerezeption", "checkin",    // Cluster II: Digitale Mitarbeiter
+      "clickdoc", "videosprechstunde", "ambulapps",        // Cluster III: Draht zum Patienten
+    ];
+
+    // 12 Keyframes: noise → idea → 9 Icons → plattform
+    const KEYFRAMES = [
+      { id: "noise",           kind: "scatter" },
+      { id: "idea",            kind: "field"   },
+      { id: "medistar",        kind: "icon", icon: "medistar"         },
+      { id: "dokuassistent",   kind: "icon", icon: "dokuassistent"    },
+      { id: "ti-messenger",    kind: "icon", icon: "ti-messenger"     },
+      { id: "telefonassistent",kind: "icon", icon: "telefonassistent" },
+      { id: "onlinerezeption", kind: "icon", icon: "onlinerezeption"  },
+      { id: "checkin",         kind: "icon", icon: "checkin"          },
+      { id: "clickdoc",        kind: "icon", icon: "clickdoc"         },
+      { id: "videosprechstunde",kind:"icon", icon: "videosprechstunde"},
+      { id: "ambulapps",       kind: "icon", icon: "ambulapps"        },
+      { id: "plattform",       kind: "grid", icons: ICON_SEQUENCE     },
+    ];
+
+    // ─── Renderer + Kamera (Engine-Logik folgt in TICKET-003) ───────────────
+
     const canvas = document.querySelector(".scene-canvas");
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -127,7 +247,6 @@
     const camera = new THREE.OrthographicCamera(-aspect, aspect, 1, -1, -20, 20);
     camera.position.z = 5;
 
-    // Placeholder: Engine-Logik folgt in TICKET-003
     renderer.render(scene, camera);
 
     window.addEventListener("resize", () => {
