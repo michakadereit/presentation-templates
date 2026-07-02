@@ -1,8 +1,8 @@
 ---
 name: create-presentation
 description: >
-  Erzeugt aus einem der drei Story-Templates (the-pitch / the-journey /
-  the-reveal) eine fertige, präsentationsreife HTML-Seite. Wählt
+  Erzeugt aus einem der Story-Templates (the-pitch / the-journey /
+  the-reveal / the-signal) eine fertige, präsentationsreife HTML-Seite. Wählt
   kontextabhängig die passende Story-Struktur (Pip Decks Storyteller
   Tactics) und three.js-Visualwelt, kopiert das Template als
   Geschwister-Ordner, füllt die Sektionen mit dem Inhalt des Nutzers und
@@ -14,7 +14,7 @@ models: [sonnet]
 
 # create-presentation
 
-Du baust aus einem der drei vorhandenen Story-Templates eine fertige
+Du baust aus einem der vorhandenen Story-Templates eine fertige
 Präsentations-Seite. Kern der Aufgabe: die **richtige Story-Struktur** für
 das Ziel des Nutzers wählen, das Template kopieren und die Sektionen mit
 echtem Inhalt füllen — ohne die Technik- und Barrierefreiheits-Leitplanken
@@ -34,11 +34,13 @@ haben muss. Wenn das aus dem Kontext nicht eindeutig ist, kurz nachfragen
 | **überzeugen / gewinnen** — eine Idee, ein Produkt, ein Vorschlag pitchen | „pitch", „verkaufen", „vorstellen", „überzeugen", „investor", „proposal" | `the-pitch` | Hero & Guide + Story Hooks + What's It About? | hell/luftig, kinetischer Gradient + Partikel |
 | **mitnehmen / bewegen** — eine Transformation, Case Study, Vorher/Nachher, persönliche Reise | „journey", „case study", „transformation", „vorher/nachher", „wie wir … geschafft haben" | `the-journey` | Man in a Hole + Rolls Royce Moment | cinematisch, Scroll-Kamerafahrt dunkel→hell |
 | **verblüffen / beweisen** — datengetrieben mit Pointe, Zahlen, Aha-Moment | „daten", „zahlen", „studie", „ergebnis", „insight", „reveal", „metrics" | `the-reveal` | Data Detective + Three is the Magic Number + Secrets & Puzzles | bold/dunkel, Partikel-Morph + Count-up-Zahlen |
+| **zusammenfügen / erklären** — ein Konzept aus Bausteinen, „aus Teilen wird ein Ganzes", markenfarben-getrieben | „konzept", „bausteine", „zusammensetzen", „aus Teilen", „vision", „manifest", „mosaik" | `the-signal` | Story Hooks + What's It About? + Show & Tell (×3) + Full Circle | Dreieck-Mosaik-Leinwand, löst sich am Übergang auf & fügt sich in jeder Sektion neu |
 
 Grenzfälle: geht es primär um **Emotion/Erzählung** → the-journey; um **eine
 harte Kennzahl als Pointe** → the-reveal; um **eine Entscheidung/Handlung
-des Publikums** → the-pitch. Im Zweifel dem Nutzer die zwei plausibelsten
-Optionen mit einem Satz Begründung anbieten.
+des Publikums** → the-pitch; um **ein Konzept, das aus 3 Bausteinen entsteht**
+(oder wo das Visual selbst die Metapher trägt) → the-signal. Im Zweifel dem
+Nutzer die zwei plausibelsten Optionen mit einem Satz Begründung anbieten.
 
 ## 2 · Template kopieren
 
@@ -93,6 +95,20 @@ Template:
 3. `reveal` — der Aha-Moment: die entscheidende Zahl, dramatisch inszeniert
    (Partikel formieren sich). Kurzer Label-Text + ein Satz Erklärung.
 4. `sowhat` — die Implikation / der Call-to-Action.
+
+**the-signal** (`#noise → #focus → #foundation → #human → #clarity → #whole`)
+1. `noise` — **Story Hooks**: die verstreuten Teile, eine offene Frage/Spannung.
+2. `focus` — **What's It About?**: eine klare Kernbotschaft; benennt die genau
+   **3 Kräfte/Bausteine**, die das Bild zusammenhalten (je eine Markenfarbe).
+3. `foundation / human / clarity` — **Show & Tell** (×3, „Three is the Magic
+   Number"): je ein Baustein, farblich gerahmt (Navy = Fundament/Struktur,
+   Gold = Mensch/Wärme, Cyan = Klarheit/Fluss). Kicker-Klasse `brand-navy /
+   brand-gold / brand-cyan` passend setzen.
+4. `whole` — **Full Circle**: alles fügt sich zum vollständigen Bild + CTA
+   (Callback auf den Anfang). Die drei Bausteine im Fazit zusammenführen.
+   Visual-Regel nicht anfassen: die Leinwand ist an Sektionsmitten scharf und
+   löst sich an den Übergängen auf — Text steht immer in der Mitte (scharf).
+   Passt am besten bei **genau 3** Kernpunkten; mehr/weniger → anderes Template.
 
 Kürzen ist erlaubt: nicht benötigte Sektionen entfernen (dann auch den
 zugehörigen Nav-Dot in `<nav class="nav-dots">` löschen, damit die Punkte

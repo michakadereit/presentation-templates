@@ -1,22 +1,28 @@
 # Presentation Templates
 
-Drei beeindruckende, präsentationsfertige HTML-Templates. Jedes verbindet eine
+Vier beeindruckende, präsentationsfertige HTML-Templates. Jedes verbindet eine
 **Storyteller-Tactics-Struktur** (Pip Decks) mit einer eigenen **three.js-Visualwelt**.
 Statisch, kein Build — per Doppelklick über `file://` lauffähig.
 
-## Die drei Templates
+## Die Templates
 
 | Ordner | Story-Struktur (Storyteller Tactics) | Visualwelt | Zweck |
 |--------|--------------------------------------|------------|-------|
 | [`the-pitch/`](the-pitch/) | **Hero & Guide** + **Story Hooks** + **What's It About?** | Hell/luftig, kinetischer Gradient + Partikelfeld | Idee/Produkt pitchen |
 | [`the-journey/`](the-journey/) | **Man in a Hole** + **Rolls Royce Moment** | Cinematisch, Scroll-Tunnel dunkel→hell | Transformation / Case Study |
 | [`the-reveal/`](the-reveal/) | **Data Detective** + **Three is the Magic Number** + **Secrets & Puzzles** | Bold/dunkel, Partikel-Morph + große Zahlen | Datengetriebene Pointe |
+| [`the-signal/`](the-signal/) | **Story Hooks** + **What's It About?** + **Show & Tell** (×3) + **Full Circle** | Dreieck-Mosaik (CGM-Palette): Leinwand löst sich am Übergang auf & fügt sich neu | Konzept „aus Teilen wird ein Ganzes" |
 
-### Warum diese drei?
+### Warum diese Auswahl?
 Maximaler Kontrast in **Struktur** *und* **Optik**:
 - **Pitch** — überzeugen (Publikum = Held, Sprecher = Guide). Aspirational, clean.
 - **Journey** — mitnehmen (emotionaler Fall-und-Aufstieg-Arc). Cinematisch, immersiv.
 - **Reveal** — verblüffen (Spannungsaufbau → Aha-Moment mit Daten). Editorial, hochkontrast.
+- **Signal** — *experimentell*: das Visual **ist** die Botschaft. Eine Leinwand aus
+  Dreiecken (Navy/Gold/Cyan) zerfällt beim Scroll-Übergang nach einer festen Regel
+  (radialer Burst + farb-abhängiger Bias + Eigenrotation) und findet in jeder Sektion
+  wieder zusammen — „aus Rauschen wird ein Bild". Basiert auf der Geometrie des
+  CGM-„Videosprechstunde"-Icons (drei Dreiecke = Play/Screen).
 
 ## Storyteller Tactics — Kurzreferenz
 
