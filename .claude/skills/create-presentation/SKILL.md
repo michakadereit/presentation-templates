@@ -57,10 +57,29 @@ Verzeichnis kopieren, außer der Nutzer verlangt es ausdrücklich → dann auch
 `shared/` mitkopieren und in der `index.html` alle `../shared/` durch
 `./shared/` ersetzen.
 
+## 2.5 · Bewegungs-Choreographie planen (`choreograph-presentation`)
+
+Bevor Texte oder Three.js-Code geschrieben werden, den
+**`choreograph-presentation`-Skill ausführen**:
+
+1. Er inventarisiert alle dynamischen Objekt-Cluster der gewählten Vorlage
+   (Three.js-Geometrien, Partikel, Kamera, Shader-Uniforms, CSS-Reveals,
+   Count-ups).
+2. Er forkt für jeden Cluster einen parallelen Agenten, der den exakten
+   Verlauf des Objekts über alle Sektionen definiert (Ruhe-Zustand,
+   Transition-In, Transition-Out, konkrete Werte).
+3. Das Ergebnis landet als `<slug>/CHOREOGRAPHY.md` — eine widerspruchsfreie
+   Blaupause, die Schritt 3 und 4 unten als **erste Informationsquelle** nutzen.
+
+> Wenn der Nutzer die Choreographie überspringen will oder das Template sehr
+> einfach ist (kein Three.js), diesen Schritt weglassen und direkt zu 3 übergehen.
+
 ## 3 · Sektionen füllen
 
 Die Sektions-Struktur **beibehalten** (IDs, Nav-Dots, Reihenfolge) und den
-Platzhalter-Inhalt durch echten ersetzen. Jede Sektion trägt im HTML einen
+Platzhalter-Inhalt durch echten ersetzen. Den Three.js-Code anhand von
+`CHOREOGRAPHY.md` schreiben, falls das Dokument existiert — es definiert
+Positionen, Schwellen und Übergänge verbindlich. Jede Sektion trägt im HTML einen
 Kommentar mit der greifenden Storyteller-Tactic — daran orientieren. Pro
 Template:
 
