@@ -349,7 +349,7 @@
       { id: "plattform",       kind: "grid", icons: ICON_SEQUENCE     },
     ];
 
-    // ─── TICKET-003: three.js Morph-Engine ──────────────────────────────────
+    // ─── three.js Morph-Engine: 1 Mesh pro SVG-Pfad ─────────────────────────
 
     const canvas = document.querySelector(".scene-canvas");
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -364,19 +364,14 @@
     const camera = new THREE.OrthographicCamera(-aspect, aspect, 1, -1, -20, 20);
     camera.position.z = 5;
 
-    // ── Helpers ──────────────────────────────────────────────────────────────
-    const smooth = (a, b, x) => {
-      const t = Math.min(Math.max((x - a) / (b - a), 0), 1);
-      return t * t * (3 - 2 * t);
-    };
+    const smooth = (a, b, x) => { const t = Math.min(Math.max((x-a)/(b-a),0),1); return t*t*(3-2*t); };
+    const lerp   = (a, b, t) => a + (b - a) * t;
     const FILL_TO_KIND = { "#003366": 0, "#FCCF4C": 1, "#2BA1EA": 2 };
 
-    // ── Step 3: Triangulate all icons via SVGLoader ───────────────────────────
+    // ── Pieces: 1 Mesh pro SVG-Pfad (glatte ShapeGeometry, keine Mikrodreiecke) ──
     const loader = new SVGLoader();
-    const GROUT = 0.88;
-    const SCALE = 0.62;
-
-    let tris = [];
+    const SCALE  = 0.62;
+    const pieces = [];
 
     for (const [iconName, icon] of Object.entries(ICONS)) {
       const half = icon.viewBox / 2;
@@ -385,221 +380,149 @@
       for (const pathData of icon.paths) {
         const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${icon.viewBox} ${icon.viewBox}"><path d="${pathData.d}"/></svg>`;
         let parsed;
-        try { parsed = loader.parse(svgStr); } catch (e) { console.warn("SVGLoader error", iconName, e); continue; }
-        if (!parsed.paths.length) continue;
+        try { parsed = loader.parse(svgStr); } catch (e) { pathIdx++; continue; }
+        if (!parsed.paths.length) { pathIdx++; continue; }
 
         const shapes = SVGLoader.createShapes(parsed.paths[0]);
-        const fill = pathData.fill.toUpperCase();
-        const kind = FILL_TO_KIND[fill] ?? 0;
-        const col3 = new THREE.Color(pathData.fill);
+        if (!shapes.length) { pathIdx++; continue; }
 
-        for (const shape of shapes) {
-          const geo = new THREE.ShapeGeometry(shape, 6).toNonIndexed();
-          const posArr = geo.attributes.position.array;
+        // Hohe Segmentzahl → runde Kurven bleiben rund
+        const geo = new THREE.ShapeGeometry(shapes[0], 48);
+        const posArr = geo.attributes.position.array;
 
-          for (let vi = 0; vi < posArr.length; vi += 9) {
-            const verts = [];
-            for (let k = 0; k < 3; k++) {
-              const svgX = posArr[vi + k * 3];
-              const svgY = posArr[vi + k * 3 + 1];
-              verts.push([
-                (svgX / half - 1) * SCALE,
-                -(svgY / half - 1) * SCALE,
-              ]);
-            }
-
-            const cx = (verts[0][0] + verts[1][0] + verts[2][0]) / 3;
-            const cy = (verts[0][1] + verts[1][1] + verts[2][1]) / 3;
-
-            const area = Math.abs(
-              (verts[1][0] - verts[0][0]) * (verts[2][1] - verts[0][1]) -
-              (verts[2][0] - verts[0][0]) * (verts[1][1] - verts[0][1])
-            ) / 2;
-            if (area < 1e-6) continue;
-
-            const off = [];
-            for (let k = 0; k < 3; k++) {
-              off.push((verts[k][0] - cx) * GROUT, (verts[k][1] - cy) * GROUT, 0);
-            }
-
-            const dx = cx, dy = cy, dl = Math.hypot(dx, dy) || 1;
-            const spread = 0.55 + Math.random() * 1.1;
-            let bx = 0, by = 0;
-            if (kind === 0) { bx = -0.35; by = -0.10; }
-            else if (kind === 1) { bx = 0.10; by = 0.55; }
-            else { bx = 0.15; by = -0.45; }
-            const sx = cx + (dx / dl) * spread + bx + (Math.random() - 0.5) * 0.4;
-            const sy = cy + (dy / dl) * spread + by + (Math.random() - 0.5) * 0.4;
-            const sz = (Math.random() - 0.5) * 3.0;
-
-            const axis = new THREE.Vector3(
-              (Math.random() - 0.5) * 0.8,
-              (Math.random() - 0.5) * 0.8,
-              1
-            ).normalize();
-
-            tris.push({
-              hx: cx, hy: cy,
-              sx, sy, sz,
-              off,
-              axis,
-              spin: (1.4 + Math.random() * 2.2) * (Math.random() < 0.5 ? -1 : 1),
-              phase: Math.random(),
-              phaseR: Math.random() * Math.PI * 2,
-              cr: col3.r, cg: col3.g, cb: col3.b,
-              kind,
-              iconName,
-              pathIdx,
-            });
-          }
-          geo.dispose();
+        // Normalisierung auf World-Koordinaten + Schwerpunkt berechnen
+        let cx = 0, cy = 0;
+        const vCount = posArr.length / 3;
+        for (let i = 0; i < posArr.length; i += 3) {
+          posArr[i]   = (posArr[i]   / half - 1) * SCALE;
+          posArr[i+1] = -(posArr[i+1] / half - 1) * SCALE;
+          cx += posArr[i]; cy += posArr[i+1];
         }
+        cx /= vCount; cy /= vCount;
+
+        // Geometrie auf (0,0) zentrieren — mesh.position steuert Platzierung
+        for (let i = 0; i < posArr.length; i += 3) {
+          posArr[i]   -= cx;
+          posArr[i+1] -= cy;
+        }
+        geo.attributes.position.needsUpdate = true;
+
+        const fillHex = pathData.fill.toUpperCase();
+        const kind = FILL_TO_KIND[fillHex] ?? 0;
+        const mat = new THREE.MeshBasicMaterial({ color: new THREE.Color(pathData.fill), side: THREE.DoubleSide });
+        const mesh = new THREE.Mesh(geo, mat);
+        scene.add(mesh);
+
+        // Scatter-Position: Bias nach Farb-Typ, leicht zufällig
+        const dl = Math.hypot(cx, cy) || 1;
+        const spread = 0.6 + Math.random() * 0.9;
+        let bx = 0, by = 0;
+        if (kind === 0) { bx = -0.35; by = -0.10; }
+        else if (kind === 1) { bx = 0.10; by = 0.55; }
+        else { bx = 0.15; by = -0.45; }
+        const sx = cx + (cx / dl) * spread + bx + (Math.random() - 0.5) * 0.35;
+        const sy = cy + (cy / dl) * spread + by + (Math.random() - 0.5) * 0.35;
+        const sz = (Math.random() - 0.5) * 0.8;
+
+        pieces.push({
+          mesh,
+          baseColor: new THREE.Color(pathData.fill),
+          iconName, pathIdx, kind,
+          hx: cx, hy: cy,
+          sx, sy, sz,
+          spin:  (0.6 + Math.random() * 1.2) * (Math.random() < 0.5 ? -1 : 1),
+          phase: Math.random(),
+          phaseR: Math.random() * Math.PI * 2,
+        });
         pathIdx++;
       }
     }
 
-    if (tris.length > 2500) tris = tris.slice(0, 2500);
-    console.log(`CGM one: ${tris.length} triangles across ${Object.keys(ICONS).length} icons`);
+    console.log(`CGM one: ${pieces.length} pieces`);
 
-    // ── Step 4: Pre-compute home positions for all 12 keyframes ──────────────
-    const fieldHomes = new Float32Array(tris.length * 3);
-    for (let i = 0; i < tris.length; i++) {
-      const angle = (i / tris.length) * Math.PI * 2 * 7.3;
-      const r = 0.25 + (i % 17) / 17 * 0.55;
-      fieldHomes[i * 3]     = Math.cos(angle) * r * 1.2;
-      fieldHomes[i * 3 + 1] = Math.sin(angle) * r * 0.85;
-      fieldHomes[i * 3 + 2] = 0;
-    }
+    // ── Field-Positionen: Spirale für alle Pieces ─────────────────────────────
+    const fieldPos = pieces.map((_, i) => {
+      const angle = (i / pieces.length) * Math.PI * 2 * 5.3;
+      const r = 0.18 + (i % 7) / 7 * 0.65;
+      return { x: Math.cos(angle) * r * 1.4, y: Math.sin(angle) * r * 0.9 };
+    });
 
-    const GRID_SCALE = 0.33;
-    const CELL = 0.48;
+    // ── Home-Position eines Piece für einen Keyframe ──────────────────────────
+    const GRID_SCALE = 0.28;
+    const CELL_W = 0.64;
+    const CELL_H = 0.44;
 
-    function buildHomePositions(kfIdx) {
-      const kf = KEYFRAMES[kfIdx];
-      const homes = new Float32Array(tris.length * 3);
-
-      for (let i = 0; i < tris.length; i++) {
-        const tr = tris[i];
-
-        if (kf.kind === "scatter") {
-          homes[i * 3] = tr.sx; homes[i * 3 + 1] = tr.sy; homes[i * 3 + 2] = tr.sz;
-
-        } else if (kf.kind === "field") {
-          homes[i * 3]     = fieldHomes[i * 3];
-          homes[i * 3 + 1] = fieldHomes[i * 3 + 1];
-          homes[i * 3 + 2] = fieldHomes[i * 3 + 2];
-
-        } else if (kf.kind === "icon") {
-          if (tr.iconName === kf.icon) {
-            homes[i * 3] = tr.hx; homes[i * 3 + 1] = tr.hy; homes[i * 3 + 2] = tr.pathIdx * 0.004;
-          } else {
-            homes[i * 3] = tr.sx; homes[i * 3 + 1] = tr.sy; homes[i * 3 + 2] = tr.sz;
-          }
-
-        } else if (kf.kind === "grid") {
-          const iconIdx = ICON_SEQUENCE.indexOf(tr.iconName);
-          if (iconIdx >= 0) {
-            const row = Math.floor(iconIdx / 3);
-            const col = iconIdx % 3;
-            const cellX = (col - 1) * CELL;
-            const cellY = (1 - row) * CELL;
-            homes[i * 3]     = tr.hx * GRID_SCALE + cellX;
-            homes[i * 3 + 1] = tr.hy * GRID_SCALE + cellY;
-            homes[i * 3 + 2] = 0;
-          } else {
-            homes[i * 3] = tr.sx; homes[i * 3 + 1] = tr.sy; homes[i * 3 + 2] = tr.sz;
-          }
-        }
+    function getHome(p, pi, kf) {
+      if (kf.kind === "scatter") return { x: p.sx, y: p.sy, z: p.sz,          scale: 1 };
+      if (kf.kind === "field")   return { x: fieldPos[pi].x, y: fieldPos[pi].y, z: 0, scale: 1 };
+      if (kf.kind === "icon") {
+        if (p.iconName === kf.icon) return { x: p.hx, y: p.hy, z: p.pathIdx * 0.005, scale: 1 };
+        return { x: p.sx, y: p.sy, z: p.sz, scale: 1 };
       }
-      return homes;
+      if (kf.kind === "grid") {
+        const idx = ICON_SEQUENCE.indexOf(p.iconName);
+        const row = Math.floor(idx / 3), col = idx % 3;
+        return {
+          x: p.hx * GRID_SCALE + (col - 1) * CELL_W,
+          y: p.hy * GRID_SCALE + (1 - row) * CELL_H,
+          z: p.pathIdx * 0.003,
+          scale: GRID_SCALE,
+        };
+      }
+      return { x: p.sx, y: p.sy, z: p.sz, scale: 1 };
     }
 
-    const allHomes = KEYFRAMES.map((_, ki) => buildHomePositions(ki));
-
-    // ── Step 5: BufferGeometry + mesh ─────────────────────────────────────────
-    const n = tris.length;
-    const pos = new Float32Array(n * 9);
-    const col = new Float32Array(n * 9);
-    const geo = new THREE.BufferGeometry();
-    const posAttr = new THREE.BufferAttribute(pos, 3);
-    const colAttr  = new THREE.BufferAttribute(col, 3);
-    geo.setAttribute("position", posAttr);
-    geo.setAttribute("color", colAttr);
-    const mat = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide });
-    const mesh = new THREE.Mesh(geo, mat);
-    scene.add(mesh);
-
-    // ── Step 6: Render loop ───────────────────────────────────────────────────
-    const q = new THREE.Quaternion();
-    const v = new THREE.Vector3();
+    // ── Render-Loop ───────────────────────────────────────────────────────────
     const clock = new THREE.Clock();
     let lastActiveKfId = null;
 
     function frame() {
       const elapsed = clock.getElapsedTime();
       const sp = window.__scrollProgress || 0;
-
       const tTotal = sp * (KEYFRAMES.length - 1);
       const iKf = Math.min(Math.floor(tTotal), KEYFRAMES.length - 2);
       const f = tTotal - iKf;
-
-      // Dissolution: 0 = sharp, 1 = fully scattered
       const d = reduce ? 0 : (1 - Math.abs(1 - 2 * f));
 
-      // Which keyframe are we assembling toward?
-      const targetHomes = f < 0.5 ? allHomes[iKf] : allHomes[iKf + 1];
+      const kfA = KEYFRAMES[iKf];
+      const kfB = KEYFRAMES[Math.min(iKf + 1, KEYFRAMES.length - 1)];
+      const kfTarget = f < 0.5 ? kfA : kfB;
 
-      // Update active icon caption — driven by engine keyframe, not DOM scroll position
-      const activeKfId = KEYFRAMES[f < 0.5 ? iKf : Math.min(iKf + 1, KEYFRAMES.length - 1)].id;
-      if (activeKfId !== lastActiveKfId) {
-        document.querySelectorAll("[data-keyframe]").forEach(el => {
-          el.classList.toggle("is-active", el.dataset.keyframe === activeKfId);
-        });
-        lastActiveKfId = activeKfId;
+      if (kfTarget.id !== lastActiveKfId) {
+        document.querySelectorAll("[data-keyframe]").forEach(el =>
+          el.classList.toggle("is-active", el.dataset.keyframe === kfTarget.id)
+        );
+        lastActiveKfId = kfTarget.id;
       }
 
-      // Which keyframe are triangles being assembled toward?
-      const kfTarget = KEYFRAMES[f < 0.5 ? iKf : Math.min(iKf + 1, KEYFRAMES.length - 1)];
-
-      for (let i = 0; i < n; i++) {
-        const tr = tris[i];
-        const lo = 0.32 + tr.phase * 0.22;  // wider rest zone so each icon rests before dissolving
+      for (let pi = 0; pi < pieces.length; pi++) {
+        const p = pieces[pi];
+        const lo = 0.32 + p.phase * 0.22;
         const a = 1 - smooth(lo, 1.0, d);  // 1 = assembled, 0 = scattered
 
-        // Non-active triangles for icon keyframes are hidden (mix=1 → BG color)
-        const triIsActive = kfTarget.kind !== "icon" || tr.iconName === kfTarget.icon;
+        const active = kfTarget.kind !== "icon" || p.iconName === kfTarget.icon;
+        const home = f < 0.5 ? getHome(p, pi, kfA) : getHome(p, pi, kfB);
 
-        // Idle wobble fades to zero as triangle assembles (stops when fully placed)
-        const idle = reduce ? 0 : Math.sin(elapsed * 0.35 + tr.phaseR) * 0.015 * (1 - a);
-        q.setFromAxisAngle(tr.axis, tr.spin * (1 - a) + idle);
+        // Position: Scatter ↔ Home interpoliert, Nicht-Aktive hinter die Szene
+        p.mesh.position.set(
+          lerp(p.sx, home.x, a),
+          lerp(p.sy, home.y, a),
+          active ? lerp(p.sz, home.z, a) : -10,
+        );
 
-        const hx = targetHomes[i * 3];
-        const hy = targetHomes[i * 3 + 1];
-        const hz = targetHomes[i * 3 + 2];
-        const cxx = tr.sx + (hx - tr.sx) * a;
-        const cyy = tr.sy + (hy - tr.sy) * a;
-        const cz  = hz === 0 ? tr.sz * (1 - a) : tr.sz + (hz - tr.sz) * a;
+        // Scale: 1 für Einzel-Icons, GRID_SCALE für die Plattform-Ansicht
+        const s = lerp(1, home.scale, a);
+        p.mesh.scale.setScalar(s);
 
-        const mix = triIsActive ? (1 - a) * 0.9 : 1.0;
-        const rr = tr.cr + (BG.r - tr.cr) * mix;
-        const gg = tr.cg + (BG.g - tr.cg) * mix;
-        const bb = tr.cb + (BG.b - tr.cb) * mix;
-        // Non-active triangles are pushed far behind the scene (z=-10) so they
-        // cannot occlude the assembled icon regardless of their scatter z-position.
-        const finalZ = triIsActive ? cz : -10;
+        // Rotation: nur Z-Achse — stoppt beim Assembly (a → 1)
+        const idle = reduce ? 0 : Math.sin(elapsed * 0.35 + p.phaseR) * 0.008 * (1 - a);
+        p.mesh.rotation.z = p.spin * (1 - a) + idle;
 
-        for (let k = 0; k < 3; k++) {
-          v.set(tr.off[k * 3], tr.off[k * 3 + 1], tr.off[k * 3 + 2]).applyQuaternion(q);
-          const b = (i * 3 + k) * 3;
-          pos[b]     = cxx + v.x;
-          pos[b + 1] = cyy + v.y;
-          pos[b + 2] = finalZ + v.z;
-          col[b]     = rr; col[b + 1] = gg; col[b + 2] = bb;
-        }
+        // Farbe: Blend zur BG-Farbe statt Opacity — kein Transparency-Sortierungs-Problem
+        const mix = active ? (1 - a) * 0.9 : 1.0;
+        p.mesh.material.color.copy(p.baseColor).lerp(BG, mix);
       }
 
-      posAttr.needsUpdate = true;
-      colAttr.needsUpdate = true;
       renderer.render(scene, camera);
       if (!reduce) requestAnimationFrame(frame);
     }
